@@ -1,0 +1,392 @@
+# models.py — Complete Updated Version (Advance Phase 1)
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime, Text, Date, UniqueConstraint
+from datetime import datetime
+from enum import Enum
+from sqlalchemy.dialects.postgresql import JSONB
+Base = declarative_base()
+
+# --- Employee Part
+
+class Employee(Base):
+    __tablename__ = "employees"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, nullable=False)
+    phone = Column(String, nullable=True)
+    address = Column(String, nullable=True)
+    role = Column(String, nullable=True)
+    # role: driver/gudam_worker/shop_worker/tod_worker
+    business_id = Column(Integer, default=1, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class EmployeeTransaction(Base):
+    __tablename__ = "employee_transactions"
+    id = Column(Integer, primary_key=True)
+    employee_id = Column(Integer, ForeignKey("employees.id"))
+    transaction_type = Column(String)  # work/payment/advance
+    amount = Column(Float)
+    transaction_date = Column(Date)
+    payment_method = Column(String, nullable=True)
+    payment_provider = Column(String, nullable=True)
+    note = Column(Text)
+    business_id = Column(Integer, default=1, nullable=False)
+    # Correction Phase — audit-trail
+    status = Column(String, default="active", nullable=False)
+    # "active" | "corrected" | "reversal"
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class Attendance(Base):
+    __tablename__ = "attendance"
+    id = Column(Integer, primary_key=True)
+    employee_id = Column(Integer, ForeignKey("employees.id"))
+    attendance_date = Column(Date)
+    attendance = Column(String, default="absent")
+    # "P" / "half" / "absent"
+    driving = Column(String, default="absent")
+    # "P" / "half" / "absent"
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# --- sales Part
+
+class Customer(Base):
+    __tablename__ = "customers"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    phone = Column(String, nullable=True)
+    address = Column(String, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class SalesTransaction(Base):
+    __tablename__ = "sales_transactions"
+    id = Column(Integer, primary_key=True)
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
+    supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=True)
+    item_name = Column(String, nullable=True)
+    unit = Column(String, nullable=True)
+    quantity = Column(Float, nullable=True)
+    rate = Column(Float, nullable=True)
+    amount = Column(Float, nullable=True)
+    driver_name = Column(String, nullable=True)
+    source = Column(String, nullable=True)   # "shop" / "gudam" / bhatte ka naam
+    destination_name = Column(String, nullable=True)
+    bill_id = Column(String, nullable=True)
+    sale_date = Column(Date)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class SalesPayment(Base):
+    __tablename__ = "sales_payments"
+    id = Column(Integer, primary_key=True)
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
+    bill_id = Column(String, nullable=True)
+    amount = Column(Float)
+    payment_date = Column(Date)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# --- Supplier part
+
+class Supplier(Base):
+    __tablename__ = "suppliers"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    supplier_type = Column(String, nullable=True)
+    address = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class SupplierTransaction(Base):
+    __tablename__ = "supplier_transactions"
+    id = Column(Integer, primary_key=True)
+    supplier_id = Column(Integer, ForeignKey("suppliers.id"))
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
+    quantity = Column(Float, nullable=True)
+    item_name = Column(String, nullable=True)
+    unit = Column(String, nullable=True)
+    rate = Column(Float, nullable=True)
+    amount = Column(Float, nullable=True)
+    driver_name = Column(String, nullable=True)
+    destination_location = Column(String, nullable=True)
+    transaction_date = Column(Date)
+    bill_id = Column(String, nullable=True)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class SupplierPayment(Base):
+    __tablename__ = "supplier_payments"
+    id = Column(Integer, primary_key=True)
+    supplier_id = Column(Integer, ForeignKey("suppliers.id"))
+    bill_id = Column(String, nullable=True)
+    amount = Column(Float)
+    payment_date = Column(Date)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# --- Inventory Part
+
+class Inventory(Base):
+    __tablename__ = "inventory"
+    id = Column(Integer, primary_key=True)
+    location = Column(String, nullable=False)
+    item_name = Column(String, nullable=False)
+    stock_quantity = Column(Float, default=0)
+    unit = Column(String, nullable=False)
+    business_id = Column(Integer, default=1, nullable=False)
+    # NOTE: Inventory is a derived running-total (one row per
+    # location+item+unit), not an append-only transaction log —
+    # Correction columns (status/reversal_of_id) don't apply here.
+    # Corrections cascade into Inventory automatically when the
+    # originating transaction (sale/supplier/movement) is reversed
+    # and re-run — this table never needs to be touched directly.
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    __table_args__ = (UniqueConstraint('location', 'item_name', 'unit', name='uq_location_item_unit'),)
+
+class Adjustment(Base):
+    __tablename__ = "stock_adjustments"
+    id = Column(Integer, primary_key=True)
+    location = Column(String, nullable=False)
+    item_name = Column(String, nullable=False)
+    unit = Column(String, nullable=False)
+    quantity_change = Column(Float, nullable=False)
+    reason = Column(String, nullable=True)
+    related_party = Column(String, nullable=True)
+    source_table = Column(String, nullable=True)
+    source_id = Column(Integer, nullable=True)
+    adjustment_date = Column(Date, nullable=False)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# --- Purchase Part
+
+class Purchase(Base):
+    __tablename__ = "purchases"
+    id = Column(Integer, primary_key=True)
+    seller_name = Column(String, nullable=False)
+    seller_phone = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+    total_amount = Column(Float, nullable=True)
+    purchase_date = Column(Date)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class PurchasePayment(Base):
+    __tablename__ = "purchase_payments"
+    id = Column(Integer, primary_key=True)
+    purchase_id = Column(Integer, ForeignKey("purchases.id"))
+    amount = Column(Float)
+    payment_date = Column(Date)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# --- Expense Part
+
+class Expense(Base):
+    __tablename__ = "expenses"
+    id = Column(Integer, primary_key=True)
+    category = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    amount = Column(Float, nullable=True)
+    expense_date = Column(Date)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ExpensePayment(Base):
+    __tablename__ = "expense_payments"
+    id = Column(Integer, primary_key=True)
+    expense_id = Column(Integer, ForeignKey("expenses.id"))
+    amount = Column(Float)
+    payment_date = Column(Date)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# --- CashLedger Part
+
+class CashLedger(Base):
+    __tablename__ = "cash_ledger"
+    id = Column(Integer, primary_key=True)
+    entry_date = Column(Date, nullable=False)
+    direction = Column(String, nullable=False)   # "in" ya "out"
+    amount = Column(Float, nullable=False)
+    category = Column(String, nullable=True)
+    source_table = Column(String, nullable=True)
+    source_id = Column(Integer, nullable=True)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# --- Activity Log Part
+
+class WorkLog(Base):
+    __tablename__ = "work_logs"
+    id = Column(Integer, primary_key=True)
+    location_type = Column(String, nullable=False)
+    location_name = Column(String, nullable=True)
+    description = Column(Text, nullable=False)
+    labour_count = Column(Integer, nullable=True)
+    activity_date = Column(Date, nullable=False)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class MaterialMovement(Base):
+    __tablename__ = "material_movements"
+    id = Column(Integer, primary_key=True)
+    item_name = Column(String, nullable=True)
+    quantity = Column(Float, nullable=True)
+    unit = Column(String, nullable=True)
+    source_type = Column(String, nullable=True)
+    source_name = Column(String, nullable=True)
+    destination_type = Column(String, nullable=True)
+    destination_name = Column(String, nullable=True)
+    movement_type = Column(String, nullable=True)
+    movement_reason = Column(String, nullable=True)
+    movement_date = Column(Date, nullable=False)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# --- Movement Entity Lookup (unified: storage / site / customer / supplier)
+# Internal machinery — no business_id, no Correction columns.
+
+class MovementEntityType(str, Enum):
+    STORAGE = "storage"
+    SITE = "site"
+    CUSTOMER = "customer"
+    SUPPLIER = "supplier"
+
+class MovementEntityLookup(Base):
+    __tablename__ = "movement_entity_lookup"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    normalized_name = Column(String, nullable=False)
+    entity_type = Column(String, nullable=False)
+    linked_id = Column(Integer, nullable=True)
+    confirmed_by = Column(String, nullable=True)
+    note = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    __table_args__ = (UniqueConstraint('normalized_name', name='uq_movement_entity_normalized_name'),)
+
+# --- Person Role Lookup (employee / customer / supplier / property_owner / family_member)
+# Internal machinery — no business_id, no Correction columns.
+
+class PersonRoleLookup(Base):
+    __tablename__ = "person_role_lookup"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    normalized_name = Column(String, nullable=False)
+    role = Column(String, nullable=False)
+    linked_id = Column(Integer, nullable=True)
+    confirmed_by = Column(String, nullable=True)
+    note = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    __table_args__ = (UniqueConstraint('normalized_name', name='uq_person_role_normalized_name'),)
+
+
+# --- Audit Log Part (Correction Phase foundation)
+
+class AuditLog(Base):
+    __tablename__ = "audit_log"
+    id = Column(Integer, primary_key=True)
+
+    # Poora user-message jaisa-ka-taisa (context ke liye)
+    full_statement = Column(Text, nullable=False)
+
+    # Extract+Grouping ke baad wala SPECIFIC action-text jisse
+    # YE particular tool-call bana — poori mixed-statement nahi,
+    # sirf is group/action ka apna text
+    action_statement = Column(Text, nullable=False)
+
+    tool_name = Column(String, nullable=False)
+    arguments = Column(JSONB, nullable=False)
+    summary_text = Column(Text, nullable=False)
+
+    group_id = Column(String, nullable=True)
+    action_index = Column(Integer, nullable=True)
+
+    target_table = Column(String, nullable=False)
+    target_id = Column(Integer, nullable=False)
+
+    category = Column(String, nullable=True)
+    person_name = Column(String, nullable=True)
+    entry_date = Column(Date, nullable=True)
+    status = Column(String, default="active", nullable=False)
+    run_id = Column(String, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

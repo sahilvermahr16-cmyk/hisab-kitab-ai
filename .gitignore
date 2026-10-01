@@ -1,0 +1,30 @@
+# Secrets
+.env
+
+# Virtual environments
+.venv/
+myenv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local databases & checkpoints (real/test data)
+*.db
+*.db-shm
+*.db-wal
+
+# Test data & outputs
+*.xlsx
+testing_output/
+
+# Scratch notebooks / debug
+g.ipynb
+debug_test.py
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

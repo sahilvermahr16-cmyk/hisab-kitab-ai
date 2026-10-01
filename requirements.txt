@@ -1,0 +1,10 @@
+langgraph
+langgraph-checkpoint-sqlite
+langchain-openai
+langchain-core
+pydantic
+sqlalchemy
+psycopg2-binary
+aiosqlite
+python-dotenv
+openpyxl
