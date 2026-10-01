@@ -101,7 +101,7 @@ test_*.py                      # node-level tests
 ## Getting started
 
 ```bash
-git clone https://github.com/<your-username>/hisab-kitab-ai.git
+git clone https://github.com/sahilvermahr16-cmyk/hisab-kitab-ai.git
 cd hisab-kitab-ai
 python -m venv .venv
 .venv\Scripts\activate          # Windows  (source .venv/bin/activate on Linux/Mac)
