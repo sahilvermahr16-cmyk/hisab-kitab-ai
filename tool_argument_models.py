@@ -150,8 +150,7 @@ class RecordSaleTransactionArgs(BaseModel):
     )
     amount: float | None = Field(
         default=None,
-        gt=0,
-        description="Total sale amount."
+        description="Total sale amount. NEGATIVE only for a customer RETURN (maal wapas)."
     )
     item_name: str | None = Field(
         default=None,
@@ -163,8 +162,7 @@ class RecordSaleTransactionArgs(BaseModel):
     )
     quantity: float | None = Field(
         default=None,
-        gt=0,
-        description="Quantity sold."
+        description="Quantity sold. NEGATIVE only for a customer RETURN (maal wapas)."
     )
     rate: float | None = Field(
         default=None,
@@ -217,10 +215,10 @@ SALES_VALIDATION_RULES = {
     ToolName.RECORD_SALE_TRANSACTION: {
         "mandatory_fields": [
             ArgumentField.CUSTOMER_NAME,
+            ArgumentField.AMOUNT,          # bina daam ki bikri nahi — rate × ginti na nikle to poocho
         ],
         "optional_fields": [
             ArgumentField.SALE_DATE,
-            ArgumentField.AMOUNT,
             ArgumentField.ITEM_NAME,
             ArgumentField.UNIT,
             ArgumentField.QUANTITY,
@@ -278,8 +276,7 @@ class RecordSupplierTransactionArgs(BaseModel):
     )
     amount: float | None = Field(
         default=None,
-        gt=0,
-        description="Total supplier-side transaction amount."
+        description="Total supplier-side transaction amount. NEGATIVE only when goods are RETURNED to the supplier (maal wapas)."
     )
     item_name: str | None = Field(
         default=None,
@@ -287,8 +284,7 @@ class RecordSupplierTransactionArgs(BaseModel):
     )
     quantity: float | None = Field(
         default=None,
-        gt=0,
-        description="Quantity of material received."
+        description="Quantity of material received. NEGATIVE only when goods are RETURNED to the supplier (maal wapas)."
     )
     unit: InventoryUnit | None = Field(
         default=None,
@@ -571,6 +567,93 @@ ADJUSTMENT_VALIDATION_RULES = {
 }
 
 # Registration
+# Opening Balance (Hisab-Kitab se pehle ka purana baaki)
+class OpeningPartyType(str, Enum):
+    EMPLOYEE = "employee"
+    CUSTOMER = "customer"
+    SUPPLIER = "supplier"
+    CASH = "cash"
+
+class OpeningDirection(str, Enum):
+    LENA = "lena"     # humein us party se lena hai
+    DENA = "dena"     # humein us party ko dena hai
+    CASH = "cash"     # sirf cash ke liye (haath / galle mein kitna tha)
+
+class RecordOpeningBalanceArgs(BaseModel):
+    party_type: OpeningPartyType | None = Field(default=None, description=(
+        "Whose old balance: employee, customer, supplier, or cash (cash in hand / galla). "
+        "Usually set automatically from the already-resolved person role."))
+    party_name: str | None = Field(default=None, description="Person/party name. Null for cash.")
+    amount: float | None = Field(default=None, gt=0, description="Old balance amount in rupees (always positive).")
+    direction: OpeningDirection | None = Field(default=None, description=(
+        "lena = WE have to RECEIVE this money from the party "
+        "(customer ka purana udhaar; employee ne advance le rakha hai; supplier ko zyada de rakha hai). "
+        "dena = WE have to PAY this money to the party "
+        "(supplier ka purana baaki; employee ki mazdoori baaki; customer ka advance pada hai). "
+        "cash = only for party_type cash."))
+    as_of_date: str | None = Field(default=None, description=(
+        "YYYY-MM-DD ONLY if the user explicitly says the date of this old balance "
+        "(e.g. '1 april ko 40000 cash tha'). Otherwise null."))
+    note: str | None = Field(default=None, description="Additional information that does not belong to any other field.")
+
+OPENING_BALANCE_VALIDATION_RULES = {
+    ToolName.RECORD_OPENING_BALANCE: {
+        "mandatory_fields": [
+            ArgumentField.PARTY_TYPE,
+            ArgumentField.AMOUNT,
+            ArgumentField.DIRECTION,
+        ],
+        "optional_fields": [
+            ArgumentField.PARTY_NAME,
+            ArgumentField.AS_OF_DATE,
+            ArgumentField.NOTE,
+        ],
+    },
+}
+
+
+# Family (ghar ke log — family kharcha)
+class FamilyTransactionType(str, Enum):
+    KHARCHA = "kharcha"   # galle se paisa ghar gaya (cash OUT)
+    JAMA = "jama"         # family member ne galle mein paisa daala (cash IN)
+
+class RecordFamilyTransactionArgs(BaseModel):
+    member_name: str | None = Field(default=None, description=(
+        "Family member's name or how the user calls them (e.g. 'Papa', 'Bhai', 'Mummy', 'Rohit')."))
+    transaction_type: FamilyTransactionType | None = Field(default=None, description=(
+        "Direction from the BUSINESS galla's point of view. "
+        "kharcha = money went OUT of the business galla to the family / home "
+        "('papa ne ghar ke liye 5000 liye', 'papa ne 1000 aur liye', 'bhai ki fees di', 'mummy ko 2000 diye', "
+        "'ghar ke ration ke liye nikale'). "
+        "jama = money came INTO the business galla FROM the family member "
+        "('mummy ne galle mein 3000 daale', 'bhai ne 5000 wapas kiye', 'papa ne business mein paise lagaye'). "
+        "IMPORTANT: the Hindi word 'liye' (X ne liye = X took) means money LEFT the galla → kharcha, never jama."))
+    amount: float | None = Field(default=None, gt=0, description="Amount in rupees (always positive).")
+    transaction_date: str | None = Field(default=None, description=(
+        "Date in YYYY-MM-DD format. Resolve relative dates (today, yesterday, kal, parso) into an actual date string. "
+        "Leave null if no date is mentioned."))
+    purpose: str | None = Field(default=None, description="What the money was for, if said (ghar ka saman, fees, dawai, shaadi...).")
+    relation: str | None = Field(default=None, description=(
+        "Relation to the owner ONLY if said separately from the name (e.g. 'Rohit bhai' → relation='bhai'). Else null."))
+    note: str | None = Field(default=None, description="Additional information that does not belong to any other field.")
+
+FAMILY_VALIDATION_RULES = {
+    ToolName.RECORD_FAMILY_TRANSACTION: {
+        "mandatory_fields": [
+            ArgumentField.MEMBER_NAME,
+            ArgumentField.TRANSACTION_TYPE,
+            ArgumentField.AMOUNT,
+        ],
+        "optional_fields": [
+            ArgumentField.TRANSACTION_DATE,
+            ArgumentField.PURPOSE,
+            ArgumentField.RELATION,
+            ArgumentField.NOTE,
+        ],
+    },
+}
+
+
 TOOL_ARGUMENT_MODELS = {
     # Employee
     ToolName.RECORD_EMPLOYEE_TRANSACTION: RecordEmployeeTransactionArgs,
@@ -599,10 +682,18 @@ TOOL_ARGUMENT_MODELS = {
     ToolName.RECORD_WORK_LOG: RecordWorkLogArgs,
     ToolName.RECORD_MATERIAL_MOVEMENT: RecordMaterialMovementArgs,
     ToolName.RECORD_ADJUSTMENT: RecordAdjustmentArgs,
+
+    # Opening balance
+    ToolName.RECORD_OPENING_BALANCE: RecordOpeningBalanceArgs,
+
+    # Family
+    ToolName.RECORD_FAMILY_TRANSACTION: RecordFamilyTransactionArgs,
 }
 
 TOOL_VALIDATION_RULES = {
     **EMPLOYEE_VALIDATION_RULES,
+    **OPENING_BALANCE_VALIDATION_RULES,
+    **FAMILY_VALIDATION_RULES,
 
     # Customer / Sales
     **SALES_VALIDATION_RULES,

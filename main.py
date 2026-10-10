@@ -1,4 +1,6 @@
 import asyncio
+import os
+import uuid
 from graph import build_app
 from langchain_core.messages import HumanMessage
 from langgraph.types import Command
@@ -11,6 +13,7 @@ from schemas import (
     PersonRoleHITLRequest,
     PersonRoleHITLResponse,
     HITLInteractionType,
+    HITLReason,
     CorrectionDateHITLRequest,
     CorrectionDateHITLResponse,
     CorrectionCategoryHITLRequest,
@@ -27,11 +30,47 @@ from schemas import (
     CorrectionActionHITLResponse,
     CorrectionStatementHITLRequest,
     CorrectionStatementHITLResponse,
+    ReportHITLRequest,
+    ReportHITLResponse,
 )
 
 from correction_format import render_table, TITLES
 
-THREAD_ID = "test_006"
+# Har statement ka apna naya thread — ek statement (aur uske saare HITL sawaal)
+# ek hi thread mein chalte hain. Pehle saari baatein ek hi "test_006" thread mein
+# jaati thi: state har baat ke saath badhti gayi aur checkpoints.db 13 GB ho gaya —
+# har step pe poori state likhne mein minute lagne lage. Statements ek-doosre pe
+# depend nahi karte (router sirf aakhri message padhta hai), isliye naya thread safe hai.
+def new_thread_id():
+    return f"cli-{uuid.uuid4().hex[:12]}"
+
+
+def warn_big_checkpoints(limit_mb=500):
+    try:
+        size = sum(os.path.getsize(f) for f in ("checkpoints.db", "checkpoints.db-wal") if os.path.exists(f))
+    except OSError:
+        return
+    if size > limit_mb * 1024 * 1024:
+        print(f"⚠️  checkpoints.db {size / 1024 / 1024 / 1024:.1f} GB ho gaya hai — app slow chalega. "
+              f"main.py band karke checkpoints.db, checkpoints.db-wal, checkpoints.db-shm delete kar do "
+              f"(isme sirf adhoori baatchit hoti hai, hisab ka data Postgres mein safe hai).")
+
+
+def _mm_choices(req):
+    """Material movement 'kahan se?' ke options: jaani-pehchaani jagahen + aakhri 'Pata nahi'."""
+    return list(getattr(req, "suggestions", []) or []) + ["Pata nahi"]
+
+
+def _print_role_options(req):
+    """Role ki list. Naam pehle se mila ho to us category ke aage ✓ — warna AI ka score."""
+    known = any(o.found for o in req.options)
+    no_scores = all(o.confidence == 0 for o in req.options)   # AI kuch nahi bata paya
+    for option in req.options:
+        if known or no_scores:
+            mark = f"  ✓ ('{req.person}' isme mila)" if option.found else ""
+            print(f"{option.option_id}. {option.role.value}{mark}")
+        else:
+            print(f"{option.option_id}. {option.role.value} ({option.confidence:.2f})")
 
 
 def display_interrupt(interrupt_value):
@@ -49,7 +88,17 @@ def display_interrupt(interrupt_value):
         print(f"Person : {interrupt_value.person}")
         print()
 
-        if interrupt_value.interaction_type == HITLInteractionType.CONFIRMATION:
+        known = interrupt_value.reason in (HITLReason.KNOWN_PERSON_CONFIRMATION, HITLReason.KNOWN_PERSON_SELECTION)
+        if known and interrupt_value.interaction_type == HITLInteractionType.CONFIRMATION:
+            top = interrupt_value.options[0]
+            print(f"'{interrupt_value.person}' humein {top.role.value} mein mila.")
+            print()
+            print(f"1. Haan, {top.role.value} hi hai")
+            print("2. Nahi, dusri category hai")
+        elif known:
+            print(f"'{interrupt_value.person}' ek se zyada category mein mila — kiska hisab hai?\n")
+            _print_role_options(interrupt_value)
+        elif interrupt_value.interaction_type == HITLInteractionType.CONFIRMATION:
             top = interrupt_value.options[0]
             print(f"AI Recommendation : {top.role.value} ({top.confidence:.2f})")
             print()
@@ -57,8 +106,7 @@ def display_interrupt(interrupt_value):
             print("2. No")
         else:
             print("Please select the correct role.\n")
-            for option in interrupt_value.options:
-                print(f"{option.option_id}. {option.role.value} ({option.confidence:.2f})")
+            _print_role_options(interrupt_value)
 
         return
 
@@ -98,8 +146,12 @@ def display_interrupt(interrupt_value):
         print("=" * 70)
 
         if interrupt_value.reason == MaterialMovementHITLReason.MISSING_FIELD:
-            print(f"\nMissing field: {interrupt_value.missing_field}")
-            print("Please provide the value (or type 'skip' to leave it unknown).")
+            q = ("Maal kahan se aaya / kahan se gaya?" if interrupt_value.missing_field == "source"
+                 else "Maal kahan gaya / kahan utra?")
+            print(f"\n{q}\n")
+            for i, name in enumerate(_mm_choices(interrupt_value), 1):
+                print(f"{i}. {name}")
+            print("\n(Number chuno, ya jagah ka naam likho)")
 
         elif interrupt_value.reason == MaterialMovementHITLReason.LOCATION_TYPE_CONFIRMATION:
             print(f"\nLocation: {interrupt_value.location_name}")
@@ -239,7 +291,28 @@ def display_interrupt(interrupt_value):
         print("CORRECTION — NAYA STATEMENT")
         print("=" * 70)
         print(f"\nPurani entry: \"{interrupt_value.old_statement}\"")
-        print("Sahi statement kya hai? (jaise: 'Ram ne 27 ko 700 ka kaam kiya')")
+        print("Sahi, poora statement do — jaise: 'Ram ne 27 ko 700 ka kaam kiya'.")
+        print("Shortcuts jaise 'usi din', 'wo nahi ye' mat likho — naam aur amount")
+        print("clearly batao. Date nahi doge to purani entry wali date use ho jayegi.")
+        print("Chhodne ke liye 'cancel' likho.")
+
+        return
+
+    # ---------------------------------------------
+    # Report — har sawaal (kind / role / name / range / language)
+    # ---------------------------------------------
+    if isinstance(interrupt_value, ReportHITLRequest):
+
+        print("\n" + "=" * 70)
+        print("REPORT")
+        print("=" * 70)
+        if interrupt_value.retry:
+            print("\nSamajh nahi aaya, dobara batao.")
+        print(f"\n{interrupt_value.question}\n")
+        for o in interrupt_value.options:
+            print(f"{o.option_id}. {o.label}")
+        if interrupt_value.hint:
+            print(f"\n({interrupt_value.hint})")
         print("Chhodne ke liye 'cancel' likho.")
 
         return
@@ -295,8 +368,7 @@ def build_resume_value(interrupt_value, user_response):
             if selected == 2:
                 # "No" — show every ranked option and let the user pick.
                 print("\nSelect Correct Role\n")
-                for option in interrupt_value.options:
-                    print(f"{option.option_id}. {option.role.value} ({option.confidence:.2f})")
+                _print_role_options(interrupt_value)
 
                 while True:
                     try:
@@ -348,9 +420,18 @@ def build_resume_value(interrupt_value, user_response):
             )
 
         if interrupt_value.reason == MaterialMovementHITLReason.MISSING_FIELD:
+            choices = _mm_choices(interrupt_value)
+            value = user_response
+            if user_response.isdigit():
+                k = int(user_response)
+                if not 1 <= k <= len(choices):
+                    return None
+                value = choices[k - 1]
+            if value == "Pata nahi" or value.lower() in ("pata nahi", "pta nhi", "skip"):
+                value = None
             return MaterialMovementHITLResponse(
                 group_id=interrupt_value.group_id,
-                provided_value=user_response,
+                provided_value=value,
                 selected_option=None,
             )
 
@@ -497,12 +578,29 @@ def build_resume_value(interrupt_value, user_response):
         )
 
     # ---------------------------------------------
+    # Report
+    # ---------------------------------------------
+    if isinstance(interrupt_value, ReportHITLRequest):
+        if user_response.lower() == "cancel":
+            return ReportHITLResponse(cancelled=True)
+        try:
+            selected = int(user_response)
+        except ValueError:
+            if interrupt_value.allow_text:
+                return ReportHITLResponse(answer=user_response)
+            return None
+        if any(o.option_id == selected for o in interrupt_value.options):
+            return ReportHITLResponse(selected_option=selected)
+        return None
+
+    # ---------------------------------------------
     # Final Confirmation / anything else
     # ---------------------------------------------
     return user_response
 
 async def main():
 
+    warn_big_checkpoints()
     app = await build_app()
 
     while True:
@@ -514,7 +612,7 @@ async def main():
 
         config = {
             "configurable": {
-                "thread_id": THREAD_ID
+                "thread_id": new_thread_id()
             }
         }
 

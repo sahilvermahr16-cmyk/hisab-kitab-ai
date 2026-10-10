@@ -4,6 +4,7 @@ from schemas import DateResolutionResult
 from state import ChatState
 from llm_setup import llm
 from schemas import DateResolutionResult, RecordType
+from date_helpers import calendar_block, fix_dates
 
 structured_llm = llm.with_structured_output(DateResolutionResult)
 
@@ -52,6 +53,23 @@ Resolve relative date references using the provided `today` value:
 
 Do not assume or independently determine today's date.
 Always use the provided `today` value.
+
+WEEKDAY NAMES — USE THIS TABLE, DO NOT CALCULATE:
+{calendar}
+"Somvaar ko", "on Monday", "सोमवार को" → the Monday date from the table.
+Never compute a weekday yourself — always read it from the table.
+
+WHAT THE MONEY IS FOR ≠ WHEN IT HAPPENED (CRITICAL):
+Phrases like "agle hafte ki mazdoori", "pichle hafte ka hisab",
+"is mahine ki salary", "kal ki dihadi", "next week's wages",
+"अगले हफ्ते की मज़दूरी" only say WHAT the money is for. They are NOT
+the date. The date is when the money was actually given/received —
+{today} unless another date is stated.
+- "Vinod ko agle mahine ki tankhwah ke 4000 abhi de diye" → {today}
+- "विनोद को पिछले हफ्ते की दिहाड़ी के 900 दिए" → {today}
+- "Paid Vinod 900 for last week's wages" → {today}
+But WITHOUT "ki/ka/ke" it IS a date:
+- "Pichle hafte Vinod ko 900 diye" → the money was given last week.
 
 If Extract Node has already resolved a date into YYYY-MM-DD, treat it as an extracted date reference and verify 
 its scope using the original_user_statement and the rules below.
@@ -395,6 +413,7 @@ or end" of the statement (Rule 2).
         yesterday=(today - timedelta(days=1)).isoformat(),
         parso=(today - timedelta(days=2)).isoformat(),
         year=today.year,
+        calendar=calendar_block(today),
     )
 
     # LLM ko sirf non-correction groups dikhao
@@ -473,6 +492,10 @@ Do not create new groups.
     for g in dated_groups:
         for idx, action in enumerate(g.actions):
             action.date = date_map[(g.group_id, idx)]   # ONLY this field changes
+
+    # Pakki jaanch: vaar ka naam / "agle hafte KI mazdoori" (code se, LLM ke hisab pe nahi)
+    for change in fix_dates(original_user_statement, dated_groups, today):
+        print(f"📅 DATE: {change}")
 
     print("\n" + "=" * 60)
     print("DATE RESOLUTION NODE")

@@ -1,0 +1,1007 @@
+{
+  "bundle": "Correction",
+  "lang": "hinglish",
+  "started": "2026-10-08T11:57:39.180059",
+  "test_date_T": "2026-10-08",
+  "date_tokens": {
+    "T": "2026-10-08",
+    "T-1": "2026-10-07",
+    "T-2": "2026-10-06",
+    "LAST_MONDAY": "2026-10-05",
+    "LAST_SATURDAY": "2026-10-03"
+  },
+  "database": "hisab_test",
+  "filters": {
+    "only": "COR-A-01,COR-A-04,COR-A-06,COR-C-03,COR-D-01,COR-D-04,COR-C-01,COR-C-02,COR-C-04",
+    "category": ""
+  },
+  "skipped_no_statement": [],
+  "results": [
+    {
+      "test_id": "COR-A-01",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Ram ki kal wali haazri galat chadh gayi, wo aaya hi nahi tha",
+      "english": "Ram's attendance for yesterday was recorded wrongly, he didn't even come",
+      "expected_outcome": "CORRECTION",
+      "expected": [],
+      "expected_ask": null,
+      "route": "correction",
+      "questions": [
+        {
+          "type": "correction",
+          "request": "CorrectionCategoryHITLRequest",
+          "text": null
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Correction",
+            "identity_key": "Ram",
+            "actions": [
+              "Ram ki kal wali haazri galat chadh gayi",
+              "Ram aaya hi nahi tha"
+            ]
+          }
+        ],
+        "correction_data": {
+          "group_id": "G1",
+          "text": "Ram ki kal wali haazri galat chadh gayi",
+          "name": "Ram",
+          "date": "2026-10-07",
+          "cancelled": false,
+          "attempts": 0,
+          "category": null,
+          "matches": [],
+          "selected_ids": [],
+          "report_shown": false,
+          "name_dropped": false,
+          "range_days": null,
+          "date_from": null,
+          "date_to": null
+        }
+      },
+      "bot_reply": null,
+      "aborted": "correction: CorrectionCategoryHITLRequest",
+      "error": null,
+      "time_sec": 53.6
+    },
+    {
+      "test_id": "COR-A-04",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Kitanu ko 2 din pehle 800 diye the, wo 600 the, theek kar do",
+      "english": "Kitanu was given 800 two days ago, it was 600, fix it",
+      "expected_outcome": "CORRECTION",
+      "expected": [],
+      "expected_ask": null,
+      "route": "correction",
+      "questions": [
+        {
+          "type": "correction",
+          "request": "CorrectionCategoryHITLRequest",
+          "text": null
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Correction",
+            "identity_key": "Kitanu",
+            "actions": [
+              "Kitanu ko 2 din pehle 800 diye the, wo 600 the, theek kar do"
+            ]
+          }
+        ],
+        "correction_data": {
+          "group_id": "G1",
+          "text": "Kitanu ko 2 din pehle 800 diye the, wo 600 the, theek kar do",
+          "name": "Kitanu",
+          "date": "2026-10-06",
+          "cancelled": false,
+          "attempts": 0,
+          "category": null,
+          "matches": [],
+          "selected_ids": [],
+          "report_shown": false,
+          "name_dropped": false,
+          "range_days": null,
+          "date_from": null,
+          "date_to": null
+        }
+      },
+      "bot_reply": null,
+      "aborted": "correction: CorrectionCategoryHITLRequest",
+      "error": null,
+      "time_sec": 51.8
+    },
+    {
+      "test_id": "COR-A-06",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Papa ne kal galle se 2000 liye the wali entry hata do",
+      "english": "Remove the entry of Papa taking 2000 from the till yesterday",
+      "expected_outcome": "CORRECTION",
+      "expected": [],
+      "expected_ask": null,
+      "route": "correction",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Papa",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Family Member",
+              "found": true,
+              "confidence": 9.5
+            },
+            {
+              "no": 2,
+              "role": "Employee",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Family",
+          "unscripted": true,
+          "answered": "Family Member"
+        },
+        {
+          "type": "correction",
+          "request": "CorrectionDateHITLRequest",
+          "text": "wali entry hata do"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_family_transaction\n\nUpdated Arguments:\n{'member_name': 'Papa', 'transaction_type': <FamilyTransactionType.KHARCHA: 'kharcha'>, 'amount': 2000.0, 'transaction_date': '2026-10-07', 'purpose': None, 'relation': None, 'note': 'galle se'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Papa",
+            "actions": [
+              "Papa ne kal galle se 2000 liye"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Correction",
+            "identity_key": "correction",
+            "actions": [
+              "wali entry hata do"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_family_transaction",
+            "args": {
+              "member_name": "Papa",
+              "transaction_type": "kharcha",
+              "amount": 2000.0,
+              "transaction_date": "2026-10-07",
+              "purpose": null,
+              "relation": null,
+              "note": "galle se"
+            }
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Family Member"
+        },
+        "correction_data": {
+          "group_id": "G2",
+          "text": "wali entry hata do",
+          "name": null,
+          "date": null,
+          "cancelled": false,
+          "attempts": 0,
+          "category": null,
+          "matches": [],
+          "selected_ids": [],
+          "report_shown": false,
+          "name_dropped": false,
+          "range_days": null,
+          "date_from": null,
+          "date_to": null
+        }
+      },
+      "bot_reply": null,
+      "aborted": "correction: CorrectionDateHITLRequest",
+      "error": null,
+      "time_sec": 57.2
+    },
+    {
+      "test_id": "COR-C-01",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Ram ko aaj 500 diye, aur kal ki uski haazri galat lagi thi",
+      "english": "Gave Ram 500 today, and his attendance yesterday was marked wrong",
+      "expected_outcome": "CORRECTION",
+      "expected": [
+        {
+          "tool": "record_employee_transaction",
+          "name": "Ram",
+          "amount": 500
+        }
+      ],
+      "expected_ask": null,
+      "route": "correction",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Ram",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Employee",
+              "found": true,
+              "confidence": 0.0
+            },
+            {
+              "no": 2,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 2.5
+            }
+          ],
+          "expected_role": "Employee",
+          "answered": "Employee"
+        },
+        {
+          "type": "correction",
+          "request": "CorrectionCategoryHITLRequest",
+          "text": null
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_employee_transaction\n\nUpdated Arguments:\n{'employee_name': 'Ram', 'transaction_type': <EmployeeTransactionType.PAYMENT: 'payment'>, 'amount': 500.0, 'transaction_date': '2026-10-08', 'payment_method': None, 'payment_provider': None, 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Ram",
+            "actions": [
+              "Ram ko aaj 500 diye"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Correction",
+            "identity_key": "Ram",
+            "actions": [
+              "Ram ki kal ki haazri galat lagi thi"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_employee_transaction",
+            "args": {
+              "employee_name": "Ram",
+              "transaction_type": "payment",
+              "amount": 500.0,
+              "transaction_date": "2026-10-08",
+              "payment_method": null,
+              "payment_provider": null,
+              "note": null
+            }
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Employee"
+        },
+        "correction_data": {
+          "group_id": "G2",
+          "text": "Ram ki kal ki haazri galat lagi thi",
+          "name": "Ram",
+          "date": "2026-10-07",
+          "cancelled": false,
+          "attempts": 0,
+          "category": null,
+          "matches": [],
+          "selected_ids": [],
+          "report_shown": false,
+          "name_dropped": false,
+          "range_days": null,
+          "date_from": null,
+          "date_to": null
+        }
+      },
+      "bot_reply": null,
+      "aborted": "correction: CorrectionCategoryHITLRequest",
+      "error": null,
+      "time_sec": 57.8
+    },
+    {
+      "test_id": "COR-C-02",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Sharma ji ne 3000 aur bheje, parso wali unki entry mein galti hai",
+      "english": "Sharma ji sent 3000 more, there's a mistake in his entry from day before yesterday",
+      "expected_outcome": "CORRECTION",
+      "expected": [
+        {
+          "tool": "record_sale_payment",
+          "name": "Sharma ji",
+          "amount": 3000
+        }
+      ],
+      "expected_ask": null,
+      "route": "correction",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Sharma ji",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Customer",
+              "found": true,
+              "confidence": 0.0
+            },
+            {
+              "no": 2,
+              "role": "Employee",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Customer",
+          "answered": "Customer"
+        },
+        {
+          "type": "correction",
+          "request": "CorrectionCategoryHITLRequest",
+          "text": null
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_sale_payment\n\nUpdated Arguments:\n{'customer_name': 'Sharma ji', 'amount': 3000.0, 'payment_date': datetime.date(2026, 10, 6), 'bill_id': None, 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Sharma ji",
+            "actions": [
+              "Sharma ji ne 3000 aur bheje"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Correction",
+            "identity_key": "Sharma ji",
+            "actions": [
+              "Parso wali unki entry mein galti hai"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_sale_payment",
+            "args": {
+              "customer_name": "Sharma ji",
+              "amount": 3000.0,
+              "payment_date": "2026-10-06",
+              "bill_id": null,
+              "note": null
+            }
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Customer"
+        },
+        "correction_data": {
+          "group_id": "G2",
+          "text": "Parso wali unki entry mein galti hai",
+          "name": "Sharma ji",
+          "date": "2026-10-06",
+          "cancelled": false,
+          "attempts": 0,
+          "category": null,
+          "matches": [],
+          "selected_ids": [],
+          "report_shown": false,
+          "name_dropped": false,
+          "range_days": null,
+          "date_from": null,
+          "date_to": null
+        }
+      },
+      "bot_reply": null,
+      "aborted": "correction: CorrectionCategoryHITLRequest",
+      "error": null,
+      "time_sec": 58.6
+    },
+    {
+      "test_id": "COR-C-03",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Aaj chai ke 120 lage, kal wala kiraya galat likha gaya tha",
+      "english": "Spent 120 on tea today, yesterday's rent was written wrong",
+      "expected_outcome": "CORRECTION",
+      "expected": [
+        {
+          "tool": "record_expense",
+          "name": null,
+          "amount": 120
+        }
+      ],
+      "expected_ask": null,
+      "route": "correction",
+      "questions": [
+        {
+          "type": "correction",
+          "request": "CorrectionCategoryHITLRequest",
+          "text": null
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_expense\n\nUpdated Arguments:\n{'category': <ExpenseCategory.MISC: 'misc'>, 'description': 'chai', 'amount': 120.0, 'expense_date': datetime.date(2026, 10, 8), 'payment_method': None, 'payment_provider': None, 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_expense_payment\n\nUpdated Arguments:\n{'description': 'chai', 'amount': 120.0, 'payment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "chai",
+            "actions": [
+              "Aaj chai ke 120 lage"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Correction",
+            "identity_key": "correction",
+            "actions": [
+              "Kal wala kiraya galat likha gaya tha"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_expense",
+            "args": {
+              "category": "misc",
+              "description": "chai",
+              "amount": 120.0,
+              "expense_date": "2026-10-08",
+              "payment_method": null,
+              "payment_provider": null,
+              "note": null
+            }
+          },
+          {
+            "group_id": "G1",
+            "tool": "record_expense_payment",
+            "args": {
+              "description": "chai",
+              "amount": 120.0,
+              "payment_date": "2026-10-08",
+              "note": null
+            }
+          }
+        ],
+        "correction_data": {
+          "group_id": "G2",
+          "text": "Kal wala kiraya galat likha gaya tha",
+          "name": null,
+          "date": "2026-10-07",
+          "cancelled": false,
+          "attempts": 0,
+          "category": null,
+          "matches": [],
+          "selected_ids": [],
+          "report_shown": false,
+          "name_dropped": false,
+          "range_days": null,
+          "date_from": null,
+          "date_to": null
+        }
+      },
+      "bot_reply": null,
+      "aborted": "correction: CorrectionCategoryHITLRequest",
+      "error": null,
+      "time_sec": 58.1
+    },
+    {
+      "test_id": "COR-C-04",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Kitanu ne aaj 700 ka kaam kiya, 4 tareekh wali uski entry cancel karo",
+      "english": "Kitanu did 700 worth of work today, cancel his entry from the 4th",
+      "expected_outcome": "CORRECTION",
+      "expected": [
+        {
+          "tool": "record_employee_transaction",
+          "name": "Kitanu",
+          "amount": 700
+        }
+      ],
+      "expected_ask": null,
+      "route": "correction",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Kitanu",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Employee",
+              "found": true,
+              "confidence": 9.5
+            },
+            {
+              "no": 2,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Employee",
+          "answered": "Employee"
+        },
+        {
+          "type": "correction",
+          "request": "CorrectionCategoryHITLRequest",
+          "text": null
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_employee_transaction\n\nUpdated Arguments:\n{'employee_name': 'Kitanu', 'transaction_type': <EmployeeTransactionType.WORK: 'work'>, 'amount': 700.0, 'transaction_date': '2026-10-08', 'payment_method': None, 'payment_provider': None, 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Kitanu",
+            "actions": [
+              "Kitanu ne 700 ka kaam kiya"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Correction",
+            "identity_key": "Kitanu",
+            "actions": [
+              "Kitanu ki 4 tareekh wali entry cancel karo"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_employee_transaction",
+            "args": {
+              "employee_name": "Kitanu",
+              "transaction_type": "work",
+              "amount": 700.0,
+              "transaction_date": "2026-10-08",
+              "payment_method": null,
+              "payment_provider": null,
+              "note": null
+            }
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Employee"
+        },
+        "correction_data": {
+          "group_id": "G2",
+          "text": "Kitanu ki 4 tareekh wali entry cancel karo",
+          "name": "Kitanu",
+          "date": "2026-10-04",
+          "cancelled": false,
+          "attempts": 0,
+          "category": null,
+          "matches": [],
+          "selected_ids": [],
+          "report_shown": false,
+          "name_dropped": false,
+          "range_days": null,
+          "date_from": null,
+          "date_to": null
+        }
+      },
+      "bot_reply": null,
+      "aborted": "correction: CorrectionCategoryHITLRequest",
+      "error": null,
+      "time_sec": 57.1
+    },
+    {
+      "test_id": "COR-D-01",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Sohan ki pichhle mahine ki 1800 dihadi abhi deni hai",
+      "english": "Sohan's 1800 wages from last month are still to be paid",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "tool": "record_opening_balance",
+          "name": "Sohan",
+          "amount": 1800
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Sohan",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Employee",
+              "found": true,
+              "confidence": 9.5
+            },
+            {
+              "no": 2,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Employee",
+          "answered": "Employee"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_opening_balance\n\nUpdated Arguments:\n{'party_type': <OpeningPartyType.EMPLOYEE: 'employee'>, 'party_name': 'Sohan', 'amount': 1800.0, 'direction': <OpeningDirection.DENA: 'dena'>, 'as_of_date': '2026-10-08', 'note': 'pichhle mahine ki dihadi abhi deni hai'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_opening_balance",
+          "args": {
+            "note": "pichhle mahine ki dihadi abhi deni hai",
+            "amount": 1800.0,
+            "direction": "dena",
+            "as_of_date": "2026-10-08",
+            "party_name": "Sohan",
+            "party_type": "employee"
+          },
+          "target_table": "opening_balances",
+          "target_id": 4,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 4,
+          "ledger_type": "employee",
+          "ledger_id": 2,
+          "amount": 1800.0,
+          "direction": "dena",
+          "as_of_date": "2026-10-08",
+          "note": "pichhle mahine ki dihadi abhi deni hai",
+          "status": "active",
+          "_table": "opening_balances"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Sohan",
+            "actions": [
+              "Sohan ki pichhle mahine ki 1800 dihadi abhi deni hai"
+            ]
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Employee"
+        },
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_opening_balance",
+            "args": {
+              "party_type": "employee",
+              "party_name": "Sohan",
+              "amount": 1800.0,
+              "direction": "dena",
+              "as_of_date": "2026-10-08",
+              "note": "pichhle mahine ki dihadi abhi deni hai",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Sohan ka purana baaki ₹1,800 dena (2026-10-08) record ho gaya.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 55.5
+    },
+    {
+      "test_id": "COR-D-04",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Purane hisab ke 15000 abhi Suresh Traders ko chukane hain",
+      "english": "15000 from the old account still has to be paid to Suresh Traders",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "tool": "record_opening_balance",
+          "name": "Suresh Traders",
+          "amount": 15000
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Suresh Traders",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Customer",
+              "found": true,
+              "confidence": 0.0
+            },
+            {
+              "no": 2,
+              "role": "Employee",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Supplier",
+          "answered": "Supplier"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_opening_balance\n\nUpdated Arguments:\n{'party_type': <OpeningPartyType.SUPPLIER: 'supplier'>, 'party_name': 'Suresh Traders', 'amount': 15000.0, 'direction': <OpeningDirection.DENA: 'dena'>, 'as_of_date': '2026-10-08', 'note': 'Purane hisab ke'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_opening_balance",
+          "args": {
+            "note": "Purane hisab ke",
+            "amount": 15000.0,
+            "direction": "dena",
+            "as_of_date": "2026-10-08",
+            "party_name": "Suresh Traders",
+            "party_type": "supplier"
+          },
+          "target_table": "opening_balances",
+          "target_id": 4,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 4,
+          "ledger_type": "supplier",
+          "ledger_id": 2,
+          "amount": 15000.0,
+          "direction": "dena",
+          "as_of_date": "2026-10-08",
+          "note": "Purane hisab ke",
+          "status": "active",
+          "_table": "opening_balances"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Suresh Traders",
+            "actions": [
+              "Purane hisab ke 15000 abhi Suresh Traders ko chukane hain"
+            ]
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Supplier"
+        },
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_opening_balance",
+            "args": {
+              "party_type": "supplier",
+              "party_name": "Suresh Traders",
+              "amount": 15000.0,
+              "direction": "dena",
+              "as_of_date": "2026-10-08",
+              "note": "Purane hisab ke",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Suresh Traders ka purana baaki ₹15,000 dena (2026-10-08) record ho gaya.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 59.6
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "sliced_prompt": true,
+  "finished": "2026-10-08T12:06:18.593810"
+}

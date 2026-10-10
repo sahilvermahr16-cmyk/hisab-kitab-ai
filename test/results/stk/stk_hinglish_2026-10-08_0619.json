@@ -1,0 +1,5130 @@
+{
+  "bundle": "Stock",
+  "lang": "hinglish",
+  "started": "2026-10-08T06:19:59.333676",
+  "test_date_T": "2026-10-08",
+  "date_tokens": {
+    "T": "2026-10-08",
+    "T-1": "2026-10-07",
+    "T-2": "2026-10-06",
+    "LAST_MONDAY": "2026-10-05",
+    "LAST_SATURDAY": "2026-10-03"
+  },
+  "database": "hisab_test",
+  "filters": {
+    "only": "",
+    "category": ""
+  },
+  "skipped_no_statement": [],
+  "results": [
+    {
+      "test_id": "STK-A-01",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Shop pe 40 fatte gudam se aaye",
+      "english": "40 planks came to the shop from the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "fatta",
+            "quantity": 40,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Gudam', 'destination_type': 'storage', 'destination_name': 'Shop', 'item_name': 'fatte', 'quantity': 40.0, 'unit': None, 'movement_type': None, 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 40.0,
+            "item_name": "fatte",
+            "source_name": "Gudam",
+            "source_type": "storage",
+            "movement_date": "2026-10-08",
+            "movement_type": "",
+            "movement_reason": "",
+            "destination_name": "Shop",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "fatte",
+          "quantity": 40.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Gudam",
+          "destination_type": "storage",
+          "destination_name": "Shop",
+          "movement_type": null,
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "gudam → shop",
+            "actions": [
+              "Shop pe 40 fatte gudam se aaye"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Gudam",
+              "destination_type": "storage",
+              "destination_name": "Shop",
+              "item_name": "fatte",
+              "quantity": 40.0,
+              "unit": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: fatte, Qty: 40.0 \n➡️ Gudam → Shop",
+      "aborted": null,
+      "error": null,
+      "time_sec": 12.7
+    },
+    {
+      "test_id": "STK-A-02",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "6 khidkiyan dukaan pe rakhwayi, gudam wali",
+      "english": "Had 6 windows from the warehouse placed at the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "khidki",
+            "quantity": 6,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "MISSING_FIELD",
+          "missing_field": "source",
+          "location": null,
+          "suggestions": [
+            "Gudam",
+            "Shop"
+          ],
+          "answered": "Pata nahi"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "UNKNOWN → dukaan",
+            "actions": [
+              "6 khidkiyan dukaan pe rakhwayi, gudam wali"
+            ]
+          }
+        ],
+        "tool_arguments": []
+      },
+      "bot_reply": "⚠️ Ye samajh nahi aaya, isliye record NAHI hua: \"6 khidkiyan dukaan pe rakhwayi, gudam wali\" — thoda saaf likh ke dobara bhejo (kisko/kisse, kitna).",
+      "aborted": null,
+      "error": null,
+      "time_sec": 5.6
+    },
+    {
+      "test_id": "STK-A-03",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Shop ki 10 kadiyan gudam pahunchi",
+      "english": "10 beams from the shop reached the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "kadi",
+            "quantity": 10,
+            "source_name": "shop",
+            "destination_name": "gudam",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Shop', 'destination_type': 'storage', 'destination_name': 'Gudam', 'item_name': 'kadiyan', 'quantity': 10.0, 'unit': <InventoryUnit.PIECE: 'piece'>, 'movement_type': None, 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "piece",
+            "quantity": 10.0,
+            "item_name": "kadiyan",
+            "source_name": "Shop",
+            "source_type": "storage",
+            "movement_date": "2026-10-08",
+            "movement_type": "",
+            "movement_reason": "",
+            "destination_name": "Gudam",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "kadiyan",
+          "quantity": 10.0,
+          "unit": "piece",
+          "source_type": "storage",
+          "source_name": "Shop",
+          "destination_type": "storage",
+          "destination_name": "Gudam",
+          "movement_type": null,
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "Shop → gudam",
+            "actions": [
+              "Shop ki 10 kadiyan gudam pahunchi"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Shop",
+              "destination_type": "storage",
+              "destination_name": "Gudam",
+              "item_name": "kadiyan",
+              "quantity": 10.0,
+              "unit": "piece",
+              "movement_type": "",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: kadiyan, Qty: 10.0 piece\n➡️ Shop → Gudam",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.6
+    },
+    {
+      "test_id": "STK-A-04",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Gudam mein 25 eent tooti mili",
+      "english": "Found 25 bricks broken in the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "eent",
+            "quantity_change": -25,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "MISSING_FIELD",
+          "missing_field": "source",
+          "location": null,
+          "suggestions": [
+            "Gudam",
+            "Shop"
+          ],
+          "answered": "Pata nahi"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "UNKNOWN → gudam",
+            "actions": [
+              "Gudam mein 25 eent tooti mili"
+            ]
+          }
+        ],
+        "tool_arguments": []
+      },
+      "bot_reply": "⚠️ Ye samajh nahi aaya, isliye record NAHI hua: \"Gudam mein 25 eent tooti mili\" — thoda saaf likh ke dobara bhejo (kisko/kisse, kitna).",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.4
+    },
+    {
+      "test_id": "STK-A-05",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Shop pe 2 chaukhat kam hain",
+      "english": "2 door frames are short at the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "shop",
+            "item_name": "chaukhat",
+            "quantity_change": -2,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'shop', 'item_name': 'chaukhat', 'unit': None, 'quantity_change': -2.0, 'reason': 'count_correction', 'adjustment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Shop pe 2 chaukhat kam hain",
+            "actions": [
+              "Shop pe 2 chaukhat kam hain"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "shop",
+              "item_name": "chaukhat",
+              "unit": "",
+              "quantity_change": -2.0,
+              "reason": "count_correction",
+              "adjustment_date": "2026-10-08",
+              "note": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "Error: unit is required.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.0
+    },
+    {
+      "test_id": "STK-A-06",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Gudam mein 5 darwaze zyada nikle",
+      "english": "5 extra doors turned up in the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "darwaza",
+            "quantity_change": 5,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'gudam', 'item_name': 'darwaze', 'unit': None, 'quantity_change': 5.0, 'reason': 'count_correction', 'adjustment_date': datetime.date(2026, 10, 8), 'note': 'zyada nikle'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "darwaze",
+            "actions": [
+              "Gudam mein 5 darwaze zyada nikle"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "gudam",
+              "item_name": "darwaze",
+              "unit": "",
+              "quantity_change": 5.0,
+              "reason": "count_correction",
+              "adjustment_date": "2026-10-08",
+              "note": "zyada nikle",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "Error: unit is required.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 6.9
+    },
+    {
+      "test_id": "STK-A-07",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Gudam mein do mazdooron ne saara maal set kiya aaj",
+      "english": "Two labourers arranged all the goods in the warehouse today",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_work_log",
+          "args": {
+            "location_type": "gudam",
+            "description": "maal set kiya",
+            "date": "T",
+            "labour_count": 2
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_work_log\n\nUpdated Arguments:\n{'location_type': <WorkLocationType.GUDAM: 'gudam'>, 'location_name': None, 'description': 'saara maal set kiya', 'labour_count': 2, 'activity_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_work_log",
+          "args": {
+            "note": "",
+            "description": "saara maal set kiya",
+            "labour_count": 2,
+            "activity_date": "2026-10-08",
+            "location_name": "",
+            "location_type": "gudam"
+          },
+          "target_table": "work_logs",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "location_type": "gudam",
+          "location_name": null,
+          "description": "saara maal set kiya",
+          "labour_count": 2,
+          "activity_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "work_logs"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "maal",
+            "actions": [
+              "Gudam mein do mazdooron ne saara maal set kiya"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_work_log",
+            "args": {
+              "location_type": "gudam",
+              "location_name": "",
+              "description": "saara maal set kiya",
+              "labour_count": 2,
+              "activity_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Work log record ho gaya.\n📍 Location: gudam\n📝 Work: saara maal set kiya\n👷 Labour: 2",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.7
+    },
+    {
+      "test_id": "STK-A-08",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Shop pe aaj rang-rogan ka kaam hua",
+      "english": "Painting work was done at the shop today",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_work_log",
+          "args": {
+            "location_type": "shop",
+            "description": "rang-rogan",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_work_log\n\nUpdated Arguments:\n{'location_type': <WorkLocationType.SHOP: 'shop'>, 'location_name': None, 'description': 'rang-rogan ka kaam', 'labour_count': None, 'activity_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_work_log",
+          "args": {
+            "note": "",
+            "description": "rang-rogan ka kaam",
+            "labour_count": 0,
+            "activity_date": "2026-10-08",
+            "location_name": "",
+            "location_type": "shop"
+          },
+          "target_table": "work_logs",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "location_type": "shop",
+          "location_name": null,
+          "description": "rang-rogan ka kaam",
+          "labour_count": null,
+          "activity_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "work_logs"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Shop pe aaj rang-rogan ka kaam hua",
+            "actions": [
+              "Shop pe aaj rang-rogan ka kaam hua"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_work_log",
+            "args": {
+              "location_type": "shop",
+              "location_name": "",
+              "description": "rang-rogan ka kaam",
+              "labour_count": 0,
+              "activity_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Work log record ho gaya.\n📍 Location: shop\n📝 Work: rang-rogan ka kaam\n👷 Labour: -",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.5
+    },
+    {
+      "test_id": "STK-A-09",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Kal shop ke liye 100 eent nikali gudam se",
+      "english": "Yesterday took out 100 bricks from the warehouse for the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "eent",
+            "quantity": 100,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T-1"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Gudam', 'destination_type': 'storage', 'destination_name': 'Shop', 'item_name': 'eent', 'quantity': 100.0, 'unit': None, 'movement_type': 'nikali', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 7), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 100.0,
+            "item_name": "eent",
+            "source_name": "Gudam",
+            "source_type": "storage",
+            "movement_date": "2026-10-07",
+            "movement_type": "nikali",
+            "movement_reason": "",
+            "destination_name": "Shop",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-07"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "ईंट",
+          "quantity": 100.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Gudam",
+          "destination_type": "storage",
+          "destination_name": "Shop",
+          "movement_type": "nikali",
+          "movement_reason": null,
+          "movement_date": "2026-10-07",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "gudam → shop",
+            "actions": [
+              "shop ke liye 100 eent nikali gudam se"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Gudam",
+              "destination_type": "storage",
+              "destination_name": "Shop",
+              "item_name": "eent",
+              "quantity": 100.0,
+              "unit": "",
+              "movement_type": "nikali",
+              "movement_reason": "",
+              "movement_date": "2026-10-07",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: ईंट, Qty: 100.0 \n➡️ Gudam → Shop",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.4
+    },
+    {
+      "test_id": "STK-A-10",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Gudam mein 3 gate jung lagne se bekaar ho gaye",
+      "english": "3 gates in the warehouse got ruined by rust",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "gate",
+            "quantity_change": -3,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'gudam', 'item_name': 'gate', 'unit': None, 'quantity_change': -3.0, 'reason': 'damage', 'adjustment_date': datetime.date(2026, 10, 8), 'note': 'jung lagne se bekaar ho gaye'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "gate jung lagne se bekaar ho gaye",
+            "actions": [
+              "Gudam mein 3 gate jung lagne se bekaar ho gaye"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "gudam",
+              "item_name": "gate",
+              "unit": "",
+              "quantity_change": -3.0,
+              "reason": "damage",
+              "adjustment_date": "2026-10-08",
+              "note": "jung lagne se bekaar ho gaye",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "Error: unit is required.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 8.2
+    },
+    {
+      "test_id": "STK-B-01",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Subah tractor mein 300 eent bhar ke dukaan pahuncha di gudam wali",
+      "english": "In the morning loaded 300 bricks from the warehouse on the tractor and delivered them to the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "eent",
+            "quantity": 300,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "MISSING_FIELD",
+          "missing_field": "source",
+          "location": null,
+          "suggestions": [
+            "Gudam",
+            "Shop"
+          ],
+          "answered": "Pata nahi"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "UNKNOWN → dukaan",
+            "actions": [
+              "Subah tractor mein 300 eent bhar ke dukaan pahuncha di"
+            ]
+          }
+        ],
+        "tool_arguments": []
+      },
+      "bot_reply": "⚠️ Ye samajh nahi aaya, isliye record NAHI hua: \"Subah tractor mein 300 eent bhar ke dukaan pahuncha di\" — thoda saaf likh ke dobara bhejo (kisko/kisse, kitna).",
+      "aborted": null,
+      "error": null,
+      "time_sec": 4.9
+    },
+    {
+      "test_id": "STK-B-02",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Shop se 20 kadiyan wapas gudam mein rakhwa di",
+      "english": "Had 20 beams put back in the warehouse from the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "kadi",
+            "quantity": 20,
+            "source_name": "shop",
+            "destination_name": "gudam",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Shop', 'destination_type': 'storage', 'destination_name': 'Gudam', 'item_name': 'kadiyan', 'quantity': 20.0, 'unit': None, 'movement_type': 'wapas', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 20.0,
+            "item_name": "kadiyan",
+            "source_name": "Shop",
+            "source_type": "storage",
+            "movement_date": "2026-10-08",
+            "movement_type": "wapas",
+            "movement_reason": "",
+            "destination_name": "Gudam",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "kadiyan",
+          "quantity": 20.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Shop",
+          "destination_type": "storage",
+          "destination_name": "Gudam",
+          "movement_type": "wapas",
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "Shop → gudam",
+            "actions": [
+              "Shop se 20 kadiyan wapas gudam mein rakhwa di"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Shop",
+              "destination_type": "storage",
+              "destination_name": "Gudam",
+              "item_name": "kadiyan",
+              "quantity": 20.0,
+              "unit": "",
+              "movement_type": "wapas",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: kadiyan, Qty: 20.0 \n➡️ Shop → Gudam",
+      "aborted": null,
+      "error": null,
+      "time_sec": 8.6
+    },
+    {
+      "test_id": "STK-B-03",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Gudam mein 50 eent toot gayi aaj utarte waqt",
+      "english": "50 bricks broke in the warehouse today while unloading",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "eent",
+            "quantity_change": -50,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "MISSING_FIELD",
+          "missing_field": "source",
+          "location": null,
+          "suggestions": [
+            "Gudam",
+            "Shop"
+          ],
+          "answered": "Pata nahi"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "UNKNOWN → gudam",
+            "actions": [
+              "Gudam mein 50 eent toot gayi aaj utarte waqt"
+            ]
+          }
+        ],
+        "tool_arguments": []
+      },
+      "bot_reply": "⚠️ Ye samajh nahi aaya, isliye record NAHI hua: \"Gudam mein 50 eent toot gayi aaj utarte waqt\" — thoda saaf likh ke dobara bhejo (kisko/kisse, kitna).",
+      "aborted": null,
+      "error": null,
+      "time_sec": 5.3
+    },
+    {
+      "test_id": "STK-B-04",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Shop pe ginti ki to 4 darwaze kam nikle",
+      "english": "Counted at the shop and 4 doors were short",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "shop",
+            "item_name": "darwaza",
+            "quantity_change": -4,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'shop', 'item_name': 'darwaze', 'unit': None, 'quantity_change': -4.0, 'reason': 'count_correction', 'adjustment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "ginti",
+            "actions": [
+              "Shop pe ginti ki to 4 darwaze kam nikle"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "shop",
+              "item_name": "darwaze",
+              "unit": "",
+              "quantity_change": -4.0,
+              "reason": "count_correction",
+              "adjustment_date": "2026-10-08",
+              "note": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "Error: unit is required.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.2
+    },
+    {
+      "test_id": "STK-B-05",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Aaj gudam ki safai karwayi, 3 labour lage the",
+      "english": "Got the warehouse cleaned today, 3 labourers worked",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_work_log",
+          "args": {
+            "location_type": "gudam",
+            "description": "safai",
+            "date": "T",
+            "labour_count": 3
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_work_log\n\nUpdated Arguments:\n{'location_type': <WorkLocationType.GUDAM: 'gudam'>, 'location_name': None, 'description': 'safai karwayi', 'labour_count': 3, 'activity_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_work_log",
+          "args": {
+            "note": "",
+            "description": "safai karwayi",
+            "labour_count": 3,
+            "activity_date": "2026-10-08",
+            "location_name": "",
+            "location_type": "gudam"
+          },
+          "target_table": "work_logs",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "location_type": "gudam",
+          "location_name": null,
+          "description": "safai karwayi",
+          "labour_count": 3,
+          "activity_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "work_logs"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "gudam ki safai",
+            "actions": [
+              "Aaj gudam ki safai karwayi, 3 labour lage the"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_work_log",
+            "args": {
+              "location_type": "gudam",
+              "location_name": "",
+              "description": "safai karwayi",
+              "labour_count": 3,
+              "activity_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Work log record ho gaya.\n📍 Location: gudam\n📝 Work: safai karwayi\n👷 Labour: 3",
+      "aborted": null,
+      "error": null,
+      "time_sec": 13.3
+    },
+    {
+      "test_id": "STK-B-06",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Model Town wali site pe aaj pichli deewar todi",
+      "english": "Broke the back wall at the Model Town site today",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_work_log",
+          "args": {
+            "location_type": "site",
+            "description": "deewar todi",
+            "date": "T",
+            "location_name": "Model Town"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_work_log\n\nUpdated Arguments:\n{'location_type': <WorkLocationType.SITE: 'site'>, 'location_name': 'Model Town', 'description': 'pichli deewar todi', 'labour_count': None, 'activity_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_work_log",
+          "args": {
+            "note": "",
+            "description": "pichli deewar todi",
+            "labour_count": 0,
+            "activity_date": "2026-10-08",
+            "location_name": "Model Town",
+            "location_type": "site"
+          },
+          "target_table": "work_logs",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "location_type": "site",
+          "location_name": "Model Town",
+          "description": "pichli deewar todi",
+          "labour_count": null,
+          "activity_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "work_logs"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Model Town wali site",
+            "actions": [
+              "Model Town wali site pe aaj pichli deewar todi"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_work_log",
+            "args": {
+              "location_type": "site",
+              "location_name": "Model Town",
+              "description": "pichli deewar todi",
+              "labour_count": 0,
+              "activity_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Work log record ho gaya.\n📍 Location: Model Town\n📝 Work: pichli deewar todi\n👷 Labour: -",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.3
+    },
+    {
+      "test_id": "STK-B-07",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Gudam mein ginti karte waqt 10 bori cement zyada mili",
+      "english": "While counting in the warehouse found 10 extra bags of cement",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "cement",
+            "quantity_change": 10,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'gudam', 'item_name': 'cement', 'unit': <InventoryUnit.BAG: 'bag'>, 'quantity_change': 10.0, 'reason': 'count_correction', 'adjustment_date': datetime.date(2026, 10, 8), 'note': 'ginti karte waqt zyada mili'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_adjustment",
+          "args": {
+            "note": "ginti karte waqt zyada mili",
+            "unit": "bag",
+            "reason": "count_correction",
+            "location": "gudam",
+            "item_name": "cement",
+            "adjustment_date": "2026-10-08",
+            "quantity_change": 10.0
+          },
+          "target_table": "stock_adjustments",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "location": "gudam",
+          "item_name": "सीमेंट",
+          "unit": "bag",
+          "quantity_change": 10.0,
+          "reason": "count_correction",
+          "related_party": null,
+          "source_table": null,
+          "source_id": null,
+          "adjustment_date": "2026-10-08",
+          "note": "ginti karte waqt zyada mili",
+          "status": "active",
+          "_table": "stock_adjustments"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "ginti karte waqt 10 bori cement zyada mili",
+            "actions": [
+              "Gudam mein ginti karte waqt 10 bori cement zyada mili"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "gudam",
+              "item_name": "cement",
+              "unit": "bag",
+              "quantity_change": 10.0,
+              "reason": "count_correction",
+              "adjustment_date": "2026-10-08",
+              "note": "ginti karte waqt zyada mili",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Stock adjustment record ho gaya.\n📍 Location: gudam\n📦 Item: सीमेंट\n🔢 Change: 10.0 bag\n📝 Reason: count_correction",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.3
+    },
+    {
+      "test_id": "STK-B-08",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Model Town ke kaam se tractor 2000 eent laya, sab gudam mein khali kar di",
+      "english": "The tractor brought 2000 bricks from the Model Town job, unloaded all in the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "eent",
+            "quantity": 2000,
+            "source_name": "Model Town",
+            "destination_name": "gudam",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "LOCATION_TYPE_CONFIRMATION",
+          "missing_field": null,
+          "location": "Model Town",
+          "suggestions": [],
+          "answered": "site"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'site', 'source_name': 'Model Town', 'destination_type': 'storage', 'destination_name': 'Gudam', 'item_name': 'eent', 'quantity': 2000.0, 'unit': None, 'movement_type': 'dump', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 2000.0,
+            "item_name": "eent",
+            "source_name": "Model Town",
+            "source_type": "site",
+            "movement_date": "2026-10-08",
+            "movement_type": "dump",
+            "movement_reason": "",
+            "destination_name": "Gudam",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "ईंट",
+          "quantity": 2000.0,
+          "unit": null,
+          "source_type": "site",
+          "source_name": "Model Town",
+          "destination_type": "storage",
+          "destination_name": "Gudam",
+          "movement_type": "dump",
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "Model Town → gudam",
+            "actions": [
+              "Model Town ke kaam se tractor 2000 eent laya, sab gudam mein khali kar di"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "site",
+              "source_name": "Model Town",
+              "destination_type": "storage",
+              "destination_name": "Gudam",
+              "item_name": "eent",
+              "quantity": 2000.0,
+              "unit": "",
+              "movement_type": "dump",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: ईंट, Qty: 2000.0 \n➡️ Model Town → Gudam",
+      "aborted": null,
+      "error": null,
+      "time_sec": 8.1
+    },
+    {
+      "test_id": "STK-B-09",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Kal shop se 15 fatte gudam bhej diye the",
+      "english": "Yesterday sent 15 planks from the shop to the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "fatta",
+            "quantity": 15,
+            "source_name": "shop",
+            "destination_name": "gudam",
+            "date": "T-1"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Shop', 'destination_type': 'storage', 'destination_name': 'Gudam', 'item_name': 'fatte', 'quantity': 15.0, 'unit': None, 'movement_type': 'bhej', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 7), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 15.0,
+            "item_name": "fatte",
+            "source_name": "Shop",
+            "source_type": "storage",
+            "movement_date": "2026-10-07",
+            "movement_type": "bhej",
+            "movement_reason": "",
+            "destination_name": "Gudam",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-07"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "fatte",
+          "quantity": 15.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Shop",
+          "destination_type": "storage",
+          "destination_name": "Gudam",
+          "movement_type": "bhej",
+          "movement_reason": null,
+          "movement_date": "2026-10-07",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "shop → gudam",
+            "actions": [
+              "shop se 15 fatte gudam bhej diye"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Shop",
+              "destination_type": "storage",
+              "destination_name": "Gudam",
+              "item_name": "fatte",
+              "quantity": 15.0,
+              "unit": "",
+              "movement_type": "bhej",
+              "movement_reason": "",
+              "movement_date": "2026-10-07",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: fatte, Qty: 15.0 \n➡️ Shop → Gudam",
+      "aborted": null,
+      "error": null,
+      "time_sec": 8.8
+    },
+    {
+      "test_id": "STK-B-10",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Barish mein gudam ki 5 khidkiyan kharab ho gayi",
+      "english": "5 windows in the warehouse got spoiled in the rain",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "khidki",
+            "quantity_change": -5,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'gudam', 'item_name': 'khidkiyan', 'unit': None, 'quantity_change': -5.0, 'reason': 'damage', 'adjustment_date': datetime.date(2026, 10, 8), 'note': 'Barish mein kharab ho gayi'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "gudam ki 5 khidkiyan",
+            "actions": [
+              "Barish mein gudam ki 5 khidkiyan kharab ho gayi"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "gudam",
+              "item_name": "khidkiyan",
+              "unit": "",
+              "quantity_change": -5.0,
+              "reason": "damage",
+              "adjustment_date": "2026-10-08",
+              "note": "Barish mein kharab ho gayi",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "Error: unit is required.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 7.0
+    },
+    {
+      "test_id": "STK-C-01",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Kuch eent dukaan pe pahunchi hain gudam se, ginti yaad nahi",
+      "english": "Some bricks reached the shop from the warehouse, don't remember the count",
+      "expected_outcome": "ASK",
+      "expected": [],
+      "expected_ask": "How many?",
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "missing_argument",
+          "tool": "record_material_movement",
+          "missing": [
+            "quantity"
+          ],
+          "arguments": {
+            "source_type": "storage",
+            "source_name": "Gudam",
+            "destination_type": "storage",
+            "destination_name": "Dukaan",
+            "item_name": "eent",
+            "quantity": null,
+            "unit": null,
+            "movement_type": null,
+            "movement_reason": "pahunchi",
+            "movement_date": "2026-10-08",
+            "note": null
+          }
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting"
+      },
+      "bot_reply": null,
+      "aborted": "missing_argument: record_material_movement ['quantity']",
+      "error": null,
+      "time_sec": 7.1
+    },
+    {
+      "test_id": "STK-C-02",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Shop pe abhi kitni eent padi hain?",
+      "english": "How many bricks are lying at the shop right now?",
+      "expected_outcome": "NO-ENTRY",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "range",
+          "question": "Kitne din ka hisab dekhna hai?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report"
+      },
+      "bot_reply": null,
+      "aborted": "report: range",
+      "error": null,
+      "time_sec": 2.3
+    },
+    {
+      "test_id": "STK-C-03",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Kal 200 eent gudam se dukaan bhejni hai",
+      "english": "Have to send 200 bricks from the warehouse to the shop tomorrow",
+      "expected_outcome": "NO-ENTRY",
+      "expected": [],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Gudam', 'destination_type': 'storage', 'destination_name': 'Dukaan', 'item_name': 'eent', 'quantity': 200.0, 'unit': None, 'movement_type': 'bhejna', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 7), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 200.0,
+            "item_name": "eent",
+            "source_name": "Gudam",
+            "source_type": "storage",
+            "movement_date": "2026-10-07",
+            "movement_type": "bhejna",
+            "movement_reason": "",
+            "destination_name": "Dukaan",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-07"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "ईंट",
+          "quantity": 200.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Gudam",
+          "destination_type": "storage",
+          "destination_name": "Dukaan",
+          "movement_type": "bhejna",
+          "movement_reason": null,
+          "movement_date": "2026-10-07",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "gudam → dukaan",
+            "actions": [
+              "200 eent gudam se dukaan bhejni hai"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Gudam",
+              "destination_type": "storage",
+              "destination_name": "Dukaan",
+              "item_name": "eent",
+              "quantity": 200.0,
+              "unit": "",
+              "movement_type": "bhejna",
+              "movement_reason": "",
+              "movement_date": "2026-10-07",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: ईंट, Qty: 200.0 \n➡️ Gudam → Dukaan",
+      "aborted": null,
+      "error": null,
+      "time_sec": 8.0
+    },
+    {
+      "test_id": "STK-C-04",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Gudam ki tooti eent 30 likhna, nahi nahi 40 thi",
+      "english": "Write 30 broken bricks in the warehouse, no no, it was 40",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "eent",
+            "quantity_change": -40,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'gudam', 'item_name': 'eent', 'unit': None, 'quantity_change': -40.0, 'reason': 'damage', 'adjustment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Gudam ki tooti eent 40 likhna",
+            "actions": [
+              "Gudam ki tooti eent 40 likhna"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "gudam",
+              "item_name": "eent",
+              "unit": "",
+              "quantity_change": -40.0,
+              "reason": "damage",
+              "adjustment_date": "2026-10-08",
+              "note": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "Error: unit is required.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 9.2
+    },
+    {
+      "test_id": "STK-C-05",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Dukaan pe dhai sau eent gudam se aa gayi",
+      "english": "Two hundred fifty bricks came to the shop from the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "eent",
+            "quantity": 250,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Gudam', 'destination_type': 'storage', 'destination_name': 'Dukaan', 'item_name': 'eent', 'quantity': 250.0, 'unit': None, 'movement_type': None, 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 250.0,
+            "item_name": "eent",
+            "source_name": "Gudam",
+            "source_type": "storage",
+            "movement_date": "2026-10-08",
+            "movement_type": "",
+            "movement_reason": "",
+            "destination_name": "Dukaan",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "ईंट",
+          "quantity": 250.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Gudam",
+          "destination_type": "storage",
+          "destination_name": "Dukaan",
+          "movement_type": null,
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "gudam → dukaan",
+            "actions": [
+              "Dukaan pe 250 eent gudam se aa gayi"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Gudam",
+              "destination_type": "storage",
+              "destination_name": "Dukaan",
+              "item_name": "eent",
+              "quantity": 250.0,
+              "unit": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: ईंट, Qty: 250.0 \n➡️ Gudam → Dukaan",
+      "aborted": null,
+      "error": null,
+      "time_sec": 6.8
+    },
+    {
+      "test_id": "STK-C-06",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Gudam mein 2 ton loha kam nikla",
+      "english": "2 tons of iron short in the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "loha",
+            "quantity_change": -2,
+            "date": "T",
+            "unit": "ton"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "MISSING_FIELD",
+          "missing_field": "source",
+          "location": null,
+          "suggestions": [
+            "Gudam",
+            "Shop"
+          ],
+          "answered": "Pata nahi"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "UNKNOWN → gudam",
+            "actions": [
+              "Gudam mein 2 ton loha kam nikla"
+            ]
+          }
+        ],
+        "tool_arguments": []
+      },
+      "bot_reply": "⚠️ Ye samajh nahi aaya, isliye record NAHI hua: \"Gudam mein 2 ton loha kam nikla\" — thoda saaf likh ke dobara bhejo (kisko/kisse, kitna).",
+      "aborted": null,
+      "error": null,
+      "time_sec": 4.5
+    },
+    {
+      "test_id": "STK-C-07",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "dukan pr gudm se 12 kadi aai",
+      "english": "12 beams came to the shop from the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "kadi",
+            "quantity": 12,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "LOCATION_TYPE_CONFIRMATION",
+          "missing_field": null,
+          "location": "gudm",
+          "suggestions": []
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting"
+      },
+      "bot_reply": null,
+      "aborted": "material_movement: LOCATION_TYPE_CONFIRMATION gudm",
+      "error": null,
+      "time_sec": 4.4
+    },
+    {
+      "test_id": "STK-C-08",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Gudam mein sab theek tha, ginti barabar nikli",
+      "english": "Everything was fine in the warehouse, the count matched",
+      "expected_outcome": "NO-ENTRY",
+      "expected": [],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "missing_argument",
+          "tool": "record_adjustment",
+          "missing": [
+            "location",
+            "item_name"
+          ],
+          "arguments": {
+            "location": null,
+            "item_name": null,
+            "unit": null,
+            "quantity_change": 0.0,
+            "reason": "count_correction",
+            "adjustment_date": "2026-10-08",
+            "note": null
+          }
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting"
+      },
+      "bot_reply": null,
+      "aborted": "missing_argument: record_adjustment ['location', 'item_name']",
+      "error": null,
+      "time_sec": 8.4
+    },
+    {
+      "test_id": "STK-C-09",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Gudam ka thoda maal dukaan pe le gaye",
+      "english": "Took some goods from the warehouse to the shop",
+      "expected_outcome": "ASK",
+      "expected": [],
+      "expected_ask": "Which item, how many?",
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "missing_argument",
+          "tool": "record_material_movement",
+          "missing": [
+            "quantity"
+          ],
+          "arguments": {
+            "source_type": "storage",
+            "source_name": "Gudam",
+            "destination_type": "storage",
+            "destination_name": "Dukaan",
+            "item_name": "maal",
+            "quantity": null,
+            "unit": null,
+            "movement_type": "le gaye",
+            "movement_reason": null,
+            "movement_date": "2026-10-08",
+            "note": "thoda"
+          }
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting"
+      },
+      "bot_reply": null,
+      "aborted": "missing_argument: record_material_movement ['quantity']",
+      "error": null,
+      "time_sec": 9.1
+    },
+    {
+      "test_id": "STK-C-10",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Parso Model Town site pe kaam nahi hua, barish thi",
+      "english": "No work happened at the Model Town site day before yesterday, it rained",
+      "expected_outcome": "NO-ENTRY",
+      "expected": [],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Model Town site",
+            "actions": [
+              "Model Town site pe kaam nahi hua, barish thi"
+            ]
+          }
+        ],
+        "tool_arguments": []
+      },
+      "bot_reply": "Kuch record nahi hua.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 6.1
+    },
+    {
+      "test_id": "STK-D-01",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Sharma ji ki site pe gudam wali 200 eent gayi, 1600 tay hue",
+      "english": "200 bricks from the warehouse went to Sharma ji's site, settled at 1600",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Customer",
+          "tool": "record_sale_transaction",
+          "args": {
+            "customer_name": "Sharma ji",
+            "item_name": "eent",
+            "quantity": 200,
+            "amount": 1600,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "Sharma ji ki site → gudam",
+            "actions": [
+              "Sharma ji ki site pe gudam wali 200 eent gayi, 1600 tay hue"
+            ]
+          }
+        ],
+        "tool_arguments": []
+      },
+      "bot_reply": "⚠️ Ye samajh nahi aaya, isliye record NAHI hua: \"Sharma ji ki site pe gudam wali 200 eent gayi, 1600 tay hue\" — thoda saaf likh ke dobara bhejo (kisko/kisse, kitna).",
+      "aborted": null,
+      "error": null,
+      "time_sec": 6.9
+    },
+    {
+      "test_id": "STK-D-02",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "SBI ki gaadi aayi, 3000 eent seedha gudam mein khali, bill 18000 ka",
+      "english": "SBI's vehicle came, 3000 bricks unloaded straight in the warehouse, bill of 18000",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Supplier",
+          "tool": "record_supplier_transaction",
+          "args": {
+            "supplier_name": "SBI Bhatta",
+            "item_name": "eent",
+            "quantity": 3000,
+            "amount": 18000,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_supplier_transaction\n\nUpdated Arguments:\n{'supplier_name': 'SBI Bhatta', 'transaction_date': datetime.date(2026, 10, 8), 'amount': 18000.0, 'item_name': 'eent', 'quantity': 3000.0, 'unit': None, 'rate': None, 'driver_name': None, 'destination_location': 'Gudam', 'customer_name': None, 'bill_id': None, 'note': 'seedha khali'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_supplier_transaction",
+          "args": {
+            "note": "seedha khali",
+            "rate": 0.0,
+            "unit": "",
+            "amount": 18000.0,
+            "bill_id": "",
+            "quantity": 3000.0,
+            "item_name": "eent",
+            "driver_name": "",
+            "customer_name": "",
+            "supplier_name": "SBI Bhatta",
+            "transaction_date": "2026-10-08",
+            "destination_location": "Gudam"
+          },
+          "target_table": "supplier_transactions",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "supplier_id": 1,
+          "customer_id": null,
+          "quantity": 3000.0,
+          "item_name": "eent",
+          "unit": null,
+          "rate": null,
+          "amount": 18000.0,
+          "driver_name": null,
+          "destination_location": "Gudam",
+          "transaction_date": "2026-10-08",
+          "bill_id": null,
+          "note": "seedha khali",
+          "status": "active",
+          "_table": "supplier_transactions"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "SBI → gudam",
+            "actions": [
+              "SBI ki gaadi aayi, 3000 eent seedha gudam mein khali, bill 18000 ka"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_supplier_transaction",
+            "args": {
+              "supplier_name": "SBI Bhatta",
+              "transaction_date": "2026-10-08",
+              "amount": 18000.0,
+              "item_name": "eent",
+              "quantity": 3000.0,
+              "unit": "",
+              "rate": 0,
+              "driver_name": "",
+              "destination_location": "Gudam",
+              "customer_name": "",
+              "bill_id": "",
+              "note": "seedha khali",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Supplier transaction record ho gayi.\n🏢 Supplier: SBI Bhatta\n📦 Item: eent\n🔢 Quantity: 3000.0\n💰 Amount: ₹18000.0",
+      "aborted": null,
+      "error": null,
+      "time_sec": 11.6
+    },
+    {
+      "test_id": "STK-D-03",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Gudam ke maalik ko is mahine ka 5000 kiraya pakda diya",
+      "english": "Handed the warehouse owner 5000 rent for this month",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_expense",
+          "args": {
+            "category": "rent",
+            "amount": 5000,
+            "description": "gudam kiraya",
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_expense_payment",
+          "args": {
+            "amount": 5000,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_expense\n\nUpdated Arguments:\n{'category': <ExpenseCategory.RENT: 'rent'>, 'description': 'kiraya', 'amount': 5000.0, 'expense_date': datetime.date(2026, 10, 8), 'payment_method': None, 'payment_provider': None, 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_expense_payment\n\nUpdated Arguments:\n{'description': 'is mahine ka kiraya', 'amount': 5000.0, 'payment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_expense",
+          "args": {
+            "note": "",
+            "amount": 5000.0,
+            "category": "rent",
+            "description": "kiraya",
+            "expense_date": "2026-10-08"
+          },
+          "target_table": "expenses",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_expense_payment",
+          "args": {
+            "note": "",
+            "amount": 5000.0,
+            "description": "is mahine ka kiraya",
+            "payment_date": "2026-10-08"
+          },
+          "target_table": "expense_payments",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "category": "rent",
+          "description": "kiraya",
+          "amount": 5000.0,
+          "expense_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "expenses"
+        },
+        {
+          "id": 1,
+          "expense_id": null,
+          "amount": 5000.0,
+          "payment_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "expense_payments"
+        }
+      ],
+      "cash_ledger": [
+        {
+          "date": "2026-10-08",
+          "direction": "out",
+          "amount": 5000.0,
+          "category": "expense_payment",
+          "source": "expense_payments#1"
+        }
+      ],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "kiraya",
+            "actions": [
+              "Gudam ke maalik ko is mahine ka 5000 kiraya pakda diya"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_expense",
+            "args": {
+              "category": "rent",
+              "description": "kiraya",
+              "amount": 5000.0,
+              "expense_date": "2026-10-08",
+              "payment_method": null,
+              "payment_provider": null,
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          },
+          {
+            "group_id": "G1",
+            "tool": "record_expense_payment",
+            "args": {
+              "description": "is mahine ka kiraya",
+              "amount": 5000.0,
+              "payment_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Expense record ho gaya.\n📂 Category: rent\n📝 Description: kiraya\n💰 Amount: ₹5000.0\n✅ Expense payment record ho gayi.\n💸 Paid: ₹5000.0\n🔗 Linked expense: none found",
+      "aborted": null,
+      "error": null,
+      "time_sec": 10.3
+    },
+    {
+      "test_id": "STK-D-04",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Sohan subah se gudam pe hai, present likh lo",
+      "english": "Sohan has been at the warehouse since morning, mark him present",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Employee",
+          "tool": "record_attendance",
+          "args": {
+            "employee_name": "Sohan",
+            "attendance": "P",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Sohan",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Employee",
+              "found": true,
+              "confidence": 8.0
+            },
+            {
+              "no": 2,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Employee",
+          "answered": "Employee"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_attendance\n\nUpdated Arguments:\n{'employee_name': 'Sohan', 'attendance': <AttendanceStatus.PRESENT: 'P'>, 'driving': <AttendanceStatus.ABSENT: 'absent'>, 'attendance_date': datetime.date(2026, 10, 8), 'note': 'subah se gudam pe hai'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_attendance",
+          "args": {
+            "note": "subah se gudam pe hai",
+            "driving": "absent",
+            "attendance": "P",
+            "employee_name": "Sohan",
+            "attendance_date": "2026-10-08"
+          },
+          "target_table": "attendance",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "employee_id": 2,
+          "attendance_date": "2026-10-08",
+          "attendance": "P",
+          "driving": "absent",
+          "note": "subah se gudam pe hai",
+          "status": "active",
+          "_table": "attendance"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Sohan",
+            "actions": [
+              "Sohan subah se gudam pe hai, present likh lo"
+            ]
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Employee"
+        },
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_attendance",
+            "args": {
+              "employee_name": "Sohan",
+              "attendance": "P",
+              "driving": "absent",
+              "attendance_date": "2026-10-08",
+              "note": "subah se gudam pe hai",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Sohan ki 2026-10-08 ki attendance record hui — Attendance: P, Driving: absent",
+      "aborted": null,
+      "error": null,
+      "time_sec": 9.0
+    },
+    {
+      "test_id": "STK-D-05",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Shop ka 1500 ka bijli bill bhara",
+      "english": "Paid the shop's electricity bill of 1500",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_expense",
+          "args": {
+            "category": "misc",
+            "amount": 1500,
+            "description": "shop bijli bill",
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_expense_payment",
+          "args": {
+            "amount": 1500,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_expense\n\nUpdated Arguments:\n{'category': <ExpenseCategory.MISC: 'misc'>, 'description': 'bijli bill', 'amount': 1500.0, 'expense_date': datetime.date(2026, 10, 8), 'payment_method': None, 'payment_provider': None, 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_expense_payment\n\nUpdated Arguments:\n{'description': 'bijli bill', 'amount': 1500.0, 'payment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_expense",
+          "args": {
+            "note": "",
+            "amount": 1500.0,
+            "category": "misc",
+            "description": "bijli bill",
+            "expense_date": "2026-10-08"
+          },
+          "target_table": "expenses",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_expense_payment",
+          "args": {
+            "note": "",
+            "amount": 1500.0,
+            "description": "bijli bill",
+            "payment_date": "2026-10-08"
+          },
+          "target_table": "expense_payments",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "category": "misc",
+          "description": "bijli bill",
+          "amount": 1500.0,
+          "expense_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "expenses"
+        },
+        {
+          "id": 1,
+          "expense_id": 1,
+          "amount": 1500.0,
+          "payment_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "expense_payments"
+        }
+      ],
+      "cash_ledger": [
+        {
+          "date": "2026-10-08",
+          "direction": "out",
+          "amount": 1500.0,
+          "category": "expense_payment",
+          "source": "expense_payments#1"
+        }
+      ],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "bijli bill",
+            "actions": [
+              "Shop ka 1500 ka bijli bill bhara"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_expense",
+            "args": {
+              "category": "misc",
+              "description": "bijli bill",
+              "amount": 1500.0,
+              "expense_date": "2026-10-08",
+              "payment_method": null,
+              "payment_provider": null,
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          },
+          {
+            "group_id": "G1",
+            "tool": "record_expense_payment",
+            "args": {
+              "description": "bijli bill",
+              "amount": 1500.0,
+              "payment_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Expense record ho gaya.\n📂 Category: misc\n📝 Description: bijli bill\n💰 Amount: ₹1500.0\n✅ Expense payment record ho gayi.\n💸 Paid: ₹1500.0\n🔗 Linked expense: bijli bill",
+      "aborted": null,
+      "error": null,
+      "time_sec": 8.4
+    },
+    {
+      "test_id": "STK-D-06",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Suresh Traders shop se 30 fatte le gaye 4500 mein, paise baad mein",
+      "english": "Suresh Traders took 30 planks from the shop for 4500, payment later",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Customer",
+          "tool": "record_sale_transaction",
+          "args": {
+            "customer_name": "Suresh Traders",
+            "item_name": "fatta",
+            "quantity": 30,
+            "amount": 4500,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Suresh Traders",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Customer",
+              "found": true,
+              "confidence": 9.9
+            },
+            {
+              "no": 2,
+              "role": "Employee",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Customer",
+          "answered": "Customer"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_sale_transaction\n\nUpdated Arguments:\n{'customer_name': 'Suresh Traders', 'sale_date': datetime.date(2026, 10, 8), 'amount': 4500.0, 'item_name': 'fatte', 'unit': <InventoryUnit.PIECE: 'piece'>, 'quantity': 30.0, 'rate': None, 'driver_name': None, 'source': 'Suresh Traders shop', 'destination_name': None, 'supplier_name': 'Suresh Traders shop', 'bill_id': None, 'note': 'paise baad mein', 'update_inventory': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_sale_transaction",
+          "args": {
+            "note": "paise baad mein",
+            "rate": 0.0,
+            "unit": "piece",
+            "amount": 4500.0,
+            "source": "Suresh Traders shop",
+            "bill_id": "",
+            "quantity": 30.0,
+            "item_name": "fatte",
+            "sale_date": "2026-10-08",
+            "driver_name": "",
+            "customer_name": "Suresh Traders",
+            "supplier_name": "Suresh Traders shop",
+            "destination_name": "",
+            "update_inventory": true
+          },
+          "target_table": "sales_transactions",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "customer_id": 1,
+          "supplier_id": 2,
+          "item_name": "fatte",
+          "unit": "piece",
+          "quantity": 30.0,
+          "rate": null,
+          "amount": 4500.0,
+          "driver_name": null,
+          "source": "Suresh Traders shop",
+          "destination_name": null,
+          "bill_id": null,
+          "sale_date": "2026-10-08",
+          "note": "paise baad mein",
+          "status": "active",
+          "_table": "sales_transactions"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Suresh Traders",
+            "actions": [
+              "Suresh Traders shop se 30 fatte le gaye 4500 mein, paise baad mein"
+            ]
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Customer"
+        },
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_sale_transaction",
+            "args": {
+              "customer_name": "Suresh Traders",
+              "sale_date": "2026-10-08",
+              "amount": 4500.0,
+              "item_name": "fatte",
+              "unit": "piece",
+              "quantity": 30.0,
+              "rate": 0,
+              "driver_name": "",
+              "source": "Suresh Traders shop",
+              "destination_name": "",
+              "supplier_name": "Suresh Traders shop",
+              "bill_id": "",
+              "note": "paise baad mein",
+              "update_inventory": true,
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Sale transaction record ho gayi.\n👤 Customer: Suresh Traders\n📦 Item: fatte\n🔢 Quantity: 30.0\n💰 Amount: ₹4500.0",
+      "aborted": null,
+      "error": null,
+      "time_sec": 9.7
+    },
+    {
+      "test_id": "STK-D-07",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Papa gudam ke galle se 2000 le gaye ghar ke liye",
+      "english": "Papa took 2000 from the warehouse till for home",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Family Member",
+          "tool": "record_family_transaction",
+          "args": {
+            "member_name": "Papa",
+            "transaction_type": "kharcha",
+            "amount": 2000,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "LOCATION_TYPE_CONFIRMATION",
+          "missing_field": null,
+          "location": "ghar",
+          "suggestions": []
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting"
+      },
+      "bot_reply": null,
+      "aborted": "material_movement: LOCATION_TYPE_CONFIRMATION ghar",
+      "error": null,
+      "time_sec": 5.3
+    },
+    {
+      "test_id": "STK-D-08",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Gupta ji ka purana makaan 2 lakh mein liya, maal baad mein gudam aayega",
+      "english": "Bought Gupta ji's old house for 2 lakh, the material will come to the warehouse later",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Property / Site Owner",
+          "tool": "record_purchase",
+          "args": {
+            "seller_name": "Gupta ji",
+            "total_amount": 200000,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_purchase\n\nUpdated Arguments:\n{'seller_name': 'Gupta ji', 'total_amount': 200000.0, 'purchase_date': datetime.date(2026, 10, 8), 'description': 'purana makaan', 'location': None, 'seller_phone': None, 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_purchase",
+          "args": {
+            "note": "",
+            "location": "",
+            "description": "purana makaan",
+            "seller_name": "Gupta ji",
+            "seller_phone": "",
+            "total_amount": 200000.0,
+            "purchase_date": "2026-10-08"
+          },
+          "target_table": "purchases",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "seller_name": "Gupta ji",
+          "seller_phone": null,
+          "description": "purana makaan",
+          "location": null,
+          "total_amount": 200000.0,
+          "purchase_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "purchases"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "makaan",
+            "actions": [
+              "Gupta ji ka purana makaan 200000 mein liya"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Standalone Transaction",
+            "identity_key": "maal",
+            "actions": [
+              "maal baad mein gudam aayega"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_purchase",
+            "args": {
+              "seller_name": "Gupta ji",
+              "total_amount": 200000.0,
+              "purchase_date": "2026-10-08",
+              "description": "purana makaan",
+              "location": "",
+              "seller_phone": "",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Purchase deal record ho gayi.\n👤 Seller: Gupta ji\n📝 Description: purana makaan\n💰 Total: ₹200000.0",
+      "aborted": null,
+      "error": null,
+      "time_sec": 11.6
+    },
+    {
+      "test_id": "STK-D-09",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Kitanu ne gudam saaf kiya, 400 usko de diye",
+      "english": "Kitanu cleaned the warehouse, gave him 400",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Employee",
+          "tool": "record_employee_transaction",
+          "args": {
+            "employee_name": "Kitanu",
+            "transaction_type": "payment",
+            "amount": 400,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Kitanu",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Employee",
+              "found": true,
+              "confidence": 9.9
+            },
+            {
+              "no": 2,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Employee",
+          "answered": "Employee"
+        },
+        {
+          "type": "missing_argument",
+          "tool": "record_employee_transaction",
+          "missing": [
+            "amount"
+          ],
+          "arguments": {
+            "employee_name": "Kitanu",
+            "transaction_type": "work",
+            "amount": null,
+            "transaction_date": "2026-10-08",
+            "payment_method": null,
+            "payment_provider": null,
+            "note": "gudam saaf kiya"
+          }
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting"
+      },
+      "bot_reply": null,
+      "aborted": "missing_argument: record_employee_transaction ['amount']",
+      "error": null,
+      "time_sec": 12.0
+    },
+    {
+      "test_id": "STK-D-10",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Shop ka shutter theek karwaya 900 mein",
+      "english": "Got the shop shutter repaired for 900",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_expense",
+          "args": {
+            "category": "repair",
+            "amount": 900,
+            "description": "shop shutter",
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_expense_payment",
+          "args": {
+            "amount": 900,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_expense\n\nUpdated Arguments:\n{'category': <ExpenseCategory.REPAIR: 'repair'>, 'description': 'shutter theek karwaya', 'amount': 900.0, 'expense_date': datetime.date(2026, 10, 8), 'payment_method': None, 'payment_provider': None, 'note': 'Shop ka'}\n\nExecute this tool? (yes/no)",
+        "Tool: record_expense_payment\n\nUpdated Arguments:\n{'description': 'shutter theek karwaya', 'amount': 900.0, 'payment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_expense",
+          "args": {
+            "note": "Shop ka",
+            "amount": 900.0,
+            "category": "repair",
+            "description": "shutter theek karwaya",
+            "expense_date": "2026-10-08"
+          },
+          "target_table": "expenses",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_expense_payment",
+          "args": {
+            "note": "",
+            "amount": 900.0,
+            "description": "shutter theek karwaya",
+            "payment_date": "2026-10-08"
+          },
+          "target_table": "expense_payments",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "category": "repair",
+          "description": "shutter theek karwaya",
+          "amount": 900.0,
+          "expense_date": "2026-10-08",
+          "note": "Shop ka",
+          "status": "active",
+          "_table": "expenses"
+        },
+        {
+          "id": 1,
+          "expense_id": 1,
+          "amount": 900.0,
+          "payment_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "expense_payments"
+        }
+      ],
+      "cash_ledger": [
+        {
+          "date": "2026-10-08",
+          "direction": "out",
+          "amount": 900.0,
+          "category": "expense_payment",
+          "source": "expense_payments#1"
+        }
+      ],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "shutter",
+            "actions": [
+              "Shop ka shutter theek karwaya 900 mein"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_expense",
+            "args": {
+              "category": "repair",
+              "description": "shutter theek karwaya",
+              "amount": 900.0,
+              "expense_date": "2026-10-08",
+              "payment_method": null,
+              "payment_provider": null,
+              "note": "Shop ka",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          },
+          {
+            "group_id": "G1",
+            "tool": "record_expense_payment",
+            "args": {
+              "description": "shutter theek karwaya",
+              "amount": 900.0,
+              "payment_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Expense record ho gaya.\n📂 Category: repair\n📝 Description: shutter theek karwaya\n💰 Amount: ₹900.0\n✅ Expense payment record ho gayi.\n💸 Paid: ₹900.0\n🔗 Linked expense: shutter theek karwaya",
+      "aborted": null,
+      "error": null,
+      "time_sec": 8.4
+    },
+    {
+      "test_id": "STK-E-01",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "500 eent gudam se dukaan bheji, 20 dukaan pahunch ke tooti nikli",
+      "english": "Sent 500 bricks from the warehouse to the shop, 20 turned out broken on reaching the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "eent",
+            "quantity": 500,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "shop",
+            "item_name": "eent",
+            "quantity_change": -20,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Gudam', 'destination_type': 'storage', 'destination_name': 'Dukaan', 'item_name': 'eent', 'quantity': 500.0, 'unit': None, 'movement_type': 'bheji', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_work_log\n\nUpdated Arguments:\n{'location_type': <WorkLocationType.SHOP: 'shop'>, 'location_name': 'dukaan', 'description': 'tooti nikli', 'labour_count': 20, 'activity_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 500.0,
+            "item_name": "eent",
+            "source_name": "Gudam",
+            "source_type": "storage",
+            "movement_date": "2026-10-08",
+            "movement_type": "bheji",
+            "movement_reason": "",
+            "destination_name": "Dukaan",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_work_log",
+          "args": {
+            "note": "",
+            "description": "tooti nikli",
+            "labour_count": 20,
+            "activity_date": "2026-10-08",
+            "location_name": "dukaan",
+            "location_type": "shop"
+          },
+          "target_table": "work_logs",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "ईंट",
+          "quantity": 500.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Gudam",
+          "destination_type": "storage",
+          "destination_name": "Dukaan",
+          "movement_type": "bheji",
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        },
+        {
+          "id": 1,
+          "location_type": "shop",
+          "location_name": "dukaan",
+          "description": "tooti nikli",
+          "labour_count": 20,
+          "activity_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "work_logs"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "gudam → dukaan",
+            "actions": [
+              "500 eent gudam se dukaan bheji"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Standalone Transaction",
+            "identity_key": "tooti",
+            "actions": [
+              "20 dukaan pahunch ke tooti nikli"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Gudam",
+              "destination_type": "storage",
+              "destination_name": "Dukaan",
+              "item_name": "eent",
+              "quantity": 500.0,
+              "unit": "",
+              "movement_type": "bheji",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_work_log",
+            "args": {
+              "location_type": "shop",
+              "location_name": "dukaan",
+              "description": "tooti nikli",
+              "labour_count": 20,
+              "activity_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: ईंट, Qty: 500.0 \n➡️ Gudam → Dukaan\n✅ Work log record ho gaya.\n📍 Location: dukaan\n📝 Work: tooti nikli\n👷 Labour: 20",
+      "aborted": null,
+      "error": null,
+      "time_sec": 10.3
+    },
+    {
+      "test_id": "STK-E-02",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "Shop se 10 kadiyan gudam bheji, Kitanu ko 300 bhaada diya",
+      "english": "Sent 10 beams from the shop to the warehouse, paid Kitanu 300 freight",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "kadi",
+            "quantity": 10,
+            "source_name": "shop",
+            "destination_name": "gudam",
+            "date": "T"
+          }
+        },
+        {
+          "role": "Employee",
+          "tool": "record_employee_transaction",
+          "args": {
+            "employee_name": "Kitanu",
+            "transaction_type": "payment",
+            "amount": 300,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Kitanu",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Employee",
+              "found": true,
+              "confidence": 0.0
+            },
+            {
+              "no": 2,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Employee",
+          "answered": "Employee"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Shop', 'destination_type': 'storage', 'destination_name': 'Gudam', 'item_name': 'kadiyan', 'quantity': 10.0, 'unit': None, 'movement_type': 'bheji', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_employee_transaction\n\nUpdated Arguments:\n{'employee_name': 'Kitanu', 'transaction_type': <EmployeeTransactionType.PAYMENT: 'payment'>, 'amount': 300.0, 'transaction_date': '2026-10-08', 'payment_method': None, 'payment_provider': None, 'note': 'bhaada diya'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 10.0,
+            "item_name": "kadiyan",
+            "source_name": "Shop",
+            "source_type": "storage",
+            "movement_date": "2026-10-08",
+            "movement_type": "bheji",
+            "movement_reason": "",
+            "destination_name": "Gudam",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_employee_transaction",
+          "args": {
+            "note": "bhaada diya",
+            "amount": 300.0,
+            "employee_name": "Kitanu",
+            "payment_method": "",
+            "payment_provider": "",
+            "transaction_date": "2026-10-08",
+            "transaction_type": "payment"
+          },
+          "target_table": "employee_transactions",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "kadiyan",
+          "quantity": 10.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Shop",
+          "destination_type": "storage",
+          "destination_name": "Gudam",
+          "movement_type": "bheji",
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        },
+        {
+          "id": 1,
+          "employee_id": 3,
+          "transaction_type": "payment",
+          "amount": 300.0,
+          "transaction_date": "2026-10-08",
+          "payment_method": null,
+          "payment_provider": null,
+          "note": "bhaada diya",
+          "status": "active",
+          "_table": "employee_transactions"
+        }
+      ],
+      "cash_ledger": [
+        {
+          "date": "2026-10-08",
+          "direction": "out",
+          "amount": 300.0,
+          "category": "salary",
+          "source": "employee_transactions#1"
+        }
+      ],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "Shop → gudam",
+            "actions": [
+              "Shop se 10 kadiyan gudam bheji"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Need Person",
+            "identity_key": "Kitanu",
+            "actions": [
+              "Kitanu ko 300 bhaada diya"
+            ]
+          }
+        ],
+        "resolved_roles": {
+          "G2": "Employee"
+        },
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Shop",
+              "destination_type": "storage",
+              "destination_name": "Gudam",
+              "item_name": "kadiyan",
+              "quantity": 10.0,
+              "unit": "",
+              "movement_type": "bheji",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_employee_transaction",
+            "args": {
+              "employee_name": "Kitanu",
+              "transaction_type": "payment",
+              "amount": 300.0,
+              "transaction_date": "2026-10-08",
+              "payment_method": "",
+              "payment_provider": "",
+              "note": "bhaada diya",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: kadiyan, Qty: 10.0 \n➡️ Shop → Gudam\n✅ Kitanu ko ₹300.0 payment record ho gayi.\n💰 CashLedger mein ₹300.0 cash OUT bhi record ho gaya.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 12.1
+    },
+    {
+      "test_id": "STK-E-03",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "Gudam mein 4 labour ne maal sambhala, aur 6 darwaze kam nikle",
+      "english": "4 labourers handled the goods in the warehouse, and 6 doors were short",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_work_log",
+          "args": {
+            "location_type": "gudam",
+            "description": "maal sambhala",
+            "date": "T",
+            "labour_count": 4
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "darwaza",
+            "quantity_change": -6,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_work_log\n\nUpdated Arguments:\n{'location_type': <WorkLocationType.GUDAM: 'gudam'>, 'location_name': None, 'description': 'maal sambhala', 'labour_count': 4, 'activity_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'gudam', 'item_name': 'darwaze', 'unit': None, 'quantity_change': -6.0, 'reason': 'count_correction', 'adjustment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_work_log",
+          "args": {
+            "note": "",
+            "description": "maal sambhala",
+            "labour_count": 4,
+            "activity_date": "2026-10-08",
+            "location_name": "",
+            "location_type": "gudam"
+          },
+          "target_table": "work_logs",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "location_type": "gudam",
+          "location_name": null,
+          "description": "maal sambhala",
+          "labour_count": 4,
+          "activity_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "work_logs"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "maal sambhala",
+            "actions": [
+              "Gudam mein 4 labour ne maal sambhala"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Standalone Transaction",
+            "identity_key": "darwaze kam nikle",
+            "actions": [
+              "Gudam mein 6 darwaze kam nikle"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_work_log",
+            "args": {
+              "location_type": "gudam",
+              "location_name": "",
+              "description": "maal sambhala",
+              "labour_count": 4,
+              "activity_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "gudam",
+              "item_name": "darwaze",
+              "unit": "",
+              "quantity_change": -6.0,
+              "reason": "count_correction",
+              "adjustment_date": "2026-10-08",
+              "note": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Work log record ho gaya.\n📍 Location: gudam\n📝 Work: maal sambhala\n👷 Labour: 4\nError: unit is required.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 9.8
+    },
+    {
+      "test_id": "STK-E-04",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "Model Town site pe kaam chala, wahan se 1500 eent gudam aayi",
+      "english": "Work went on at the Model Town site, 1500 bricks came from there to the warehouse",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_work_log",
+          "args": {
+            "location_type": "site",
+            "description": "kaam chala",
+            "date": "T",
+            "location_name": "Model Town"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "eent",
+            "quantity": 1500,
+            "source_name": "Model Town",
+            "destination_name": "gudam",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "LOCATION_TYPE_CONFIRMATION",
+          "missing_field": null,
+          "location": "Model Town",
+          "suggestions": [],
+          "answered": "site"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_work_log\n\nUpdated Arguments:\n{'location_type': <WorkLocationType.SITE: 'site'>, 'location_name': 'Model Town', 'description': 'kaam chala', 'labour_count': None, 'activity_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'site', 'source_name': 'Model Town', 'destination_type': 'storage', 'destination_name': 'Gudam', 'item_name': 'eent', 'quantity': 1500.0, 'unit': None, 'movement_type': None, 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_work_log",
+          "args": {
+            "note": "",
+            "description": "kaam chala",
+            "labour_count": 0,
+            "activity_date": "2026-10-08",
+            "location_name": "Model Town",
+            "location_type": "site"
+          },
+          "target_table": "work_logs",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 1500.0,
+            "item_name": "eent",
+            "source_name": "Model Town",
+            "source_type": "site",
+            "movement_date": "2026-10-08",
+            "movement_type": "",
+            "movement_reason": "",
+            "destination_name": "Gudam",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "location_type": "site",
+          "location_name": "Model Town",
+          "description": "kaam chala",
+          "labour_count": null,
+          "activity_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "work_logs"
+        },
+        {
+          "id": 1,
+          "item_name": "ईंट",
+          "quantity": 1500.0,
+          "unit": null,
+          "source_type": "site",
+          "source_name": "Model Town",
+          "destination_type": "storage",
+          "destination_name": "Gudam",
+          "movement_type": null,
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Model Town site",
+            "actions": [
+              "Model Town site pe kaam chala"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Material Movement",
+            "identity_key": "Model Town → gudam",
+            "actions": [
+              "Model Town se 1500 eent gudam aayi"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_work_log",
+            "args": {
+              "location_type": "site",
+              "location_name": "Model Town",
+              "description": "kaam chala",
+              "labour_count": 0,
+              "activity_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "site",
+              "source_name": "Model Town",
+              "destination_type": "storage",
+              "destination_name": "Gudam",
+              "item_name": "eent",
+              "quantity": 1500.0,
+              "unit": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Work log record ho gaya.\n📍 Location: Model Town\n📝 Work: kaam chala\n👷 Labour: -\n✅ Material movement record ho gaya.\n📦 Item: ईंट, Qty: 1500.0 \n➡️ Model Town → Gudam",
+      "aborted": null,
+      "error": null,
+      "time_sec": 10.1
+    },
+    {
+      "test_id": "STK-E-05",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "Gudam se 100 eent Sharma ji ko 900 mein gayi aur 200 shop pe",
+      "english": "100 bricks went from the warehouse to Sharma ji for 900 and 200 to the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Customer",
+          "tool": "record_sale_transaction",
+          "args": {
+            "customer_name": "Sharma ji",
+            "item_name": "eent",
+            "quantity": 100,
+            "amount": 900,
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "eent",
+            "quantity": 200,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_sale_transaction\n\nUpdated Arguments:\n{'customer_name': 'Sharma ji', 'sale_date': datetime.date(2026, 10, 8), 'amount': 900.0, 'item_name': 'eent', 'unit': None, 'quantity': 100.0, 'rate': None, 'driver_name': None, 'source': 'Gudam', 'destination_name': None, 'supplier_name': 'Gudam', 'bill_id': None, 'note': None, 'update_inventory': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Gudam', 'destination_type': 'storage', 'destination_name': 'Shop', 'item_name': 'eent', 'quantity': 200.0, 'unit': None, 'movement_type': None, 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_sale_transaction",
+          "args": {
+            "note": "",
+            "rate": 0.0,
+            "unit": "",
+            "amount": 900.0,
+            "source": "Gudam",
+            "bill_id": "",
+            "quantity": 100.0,
+            "item_name": "eent",
+            "sale_date": "2026-10-08",
+            "driver_name": "",
+            "customer_name": "Sharma ji",
+            "supplier_name": "Gudam",
+            "destination_name": "",
+            "update_inventory": true
+          },
+          "target_table": "sales_transactions",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 200.0,
+            "item_name": "eent",
+            "source_name": "Gudam",
+            "source_type": "storage",
+            "movement_date": "2026-10-08",
+            "movement_type": "",
+            "movement_reason": "",
+            "destination_name": "Shop",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "customer_id": 2,
+          "supplier_id": 2,
+          "item_name": "eent",
+          "unit": null,
+          "quantity": 100.0,
+          "rate": null,
+          "amount": 900.0,
+          "driver_name": null,
+          "source": "Gudam",
+          "destination_name": null,
+          "bill_id": null,
+          "sale_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "sales_transactions"
+        },
+        {
+          "id": 1,
+          "item_name": "ईंट",
+          "quantity": 200.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Gudam",
+          "destination_type": "storage",
+          "destination_name": "Shop",
+          "movement_type": null,
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "Gudam → Sharma ji",
+            "actions": [
+              "Gudam se 100 eent Sharma ji ko 900 mein gayi"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Material Movement",
+            "identity_key": "Gudam → shop",
+            "actions": [
+              "Gudam se 200 eent shop pe gayi"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_sale_transaction",
+            "args": {
+              "customer_name": "Sharma ji",
+              "sale_date": "2026-10-08",
+              "amount": 900.0,
+              "item_name": "eent",
+              "unit": "",
+              "quantity": 100.0,
+              "rate": 0,
+              "driver_name": "",
+              "source": "Gudam",
+              "destination_name": "",
+              "supplier_name": "Gudam",
+              "bill_id": "",
+              "note": "",
+              "update_inventory": true,
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Gudam",
+              "destination_type": "storage",
+              "destination_name": "Shop",
+              "item_name": "eent",
+              "quantity": 200.0,
+              "unit": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Sale transaction record ho gayi.\n👤 Customer: Sharma ji\n📦 Item: eent\n🔢 Quantity: 100.0\n💰 Amount: ₹900.0\n✅ Material movement record ho gaya.\n📦 Item: ईंट, Qty: 200.0 \n➡️ Gudam → Shop",
+      "aborted": null,
+      "error": null,
+      "time_sec": 10.1
+    },
+    {
+      "test_id": "STK-E-06",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "Shop pe 8 khidkiyan tooti mili, aur gudam ka kiraya 5000 diya",
+      "english": "Found 8 windows broken at the shop, and paid the warehouse rent of 5000",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "shop",
+            "item_name": "khidki",
+            "quantity_change": -8,
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_expense",
+          "args": {
+            "category": "rent",
+            "amount": 5000,
+            "description": "gudam kiraya",
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_expense_payment",
+          "args": {
+            "amount": 5000,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'shop', 'item_name': 'khidkiyan', 'unit': None, 'quantity_change': -8.0, 'reason': 'damage', 'adjustment_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_expense\n\nUpdated Arguments:\n{'category': <ExpenseCategory.RENT: 'rent'>, 'description': 'kiraya', 'amount': 5000.0, 'expense_date': datetime.date(2026, 10, 8), 'payment_method': None, 'payment_provider': None, 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_expense_payment\n\nUpdated Arguments:\n{'description': 'kiraya', 'amount': 5000.0, 'payment_date': datetime.date(2026, 10, 8), 'note': 'Gudam ka'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_expense",
+          "args": {
+            "note": "",
+            "amount": 5000.0,
+            "category": "rent",
+            "description": "kiraya",
+            "expense_date": "2026-10-08"
+          },
+          "target_table": "expenses",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_expense_payment",
+          "args": {
+            "note": "Gudam ka",
+            "amount": 5000.0,
+            "description": "kiraya",
+            "payment_date": "2026-10-08"
+          },
+          "target_table": "expense_payments",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "category": "rent",
+          "description": "kiraya",
+          "amount": 5000.0,
+          "expense_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "expenses"
+        },
+        {
+          "id": 1,
+          "expense_id": 1,
+          "amount": 5000.0,
+          "payment_date": "2026-10-08",
+          "note": "Gudam ka",
+          "status": "active",
+          "_table": "expense_payments"
+        }
+      ],
+      "cash_ledger": [
+        {
+          "date": "2026-10-08",
+          "direction": "out",
+          "amount": 5000.0,
+          "category": "expense_payment",
+          "source": "expense_payments#1"
+        }
+      ],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Shop pe 8 khidkiyan tooti mili",
+            "actions": [
+              "Shop pe 8 khidkiyan tooti mili"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Gudam ka kiraya 5000 diya",
+            "actions": [
+              "Gudam ka kiraya 5000 diya"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "shop",
+              "item_name": "khidkiyan",
+              "unit": "",
+              "quantity_change": -8.0,
+              "reason": "damage",
+              "adjustment_date": "2026-10-08",
+              "note": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_expense",
+            "args": {
+              "category": "rent",
+              "description": "kiraya",
+              "amount": 5000.0,
+              "expense_date": "2026-10-08",
+              "payment_method": null,
+              "payment_provider": null,
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_expense_payment",
+            "args": {
+              "description": "kiraya",
+              "amount": 5000.0,
+              "payment_date": "2026-10-08",
+              "note": "Gudam ka",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "Error: unit is required.\n✅ Expense record ho gaya.\n📂 Category: rent\n📝 Description: kiraya\n💰 Amount: ₹5000.0\n✅ Expense payment record ho gayi.\n💸 Paid: ₹5000.0\n🔗 Linked expense: kiraya",
+      "aborted": null,
+      "error": null,
+      "time_sec": 10.9
+    },
+    {
+      "test_id": "STK-E-07",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "Kal gudam se 50 fatte shop gaye, aaj shop pe 5 kam nikle",
+      "english": "Yesterday 50 planks went from the warehouse to the shop, today 5 were short at the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "fatta",
+            "quantity": 50,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T-1"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "shop",
+            "item_name": "fatta",
+            "quantity_change": -5,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Gudam', 'destination_type': 'storage', 'destination_name': 'Shop', 'item_name': 'fatte', 'quantity': 50.0, 'unit': None, 'movement_type': 'gaye', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 7), 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_work_log\n\nUpdated Arguments:\n{'location_type': <WorkLocationType.SHOP: 'shop'>, 'location_name': None, 'description': '5 kam nikle', 'labour_count': 5, 'activity_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 50.0,
+            "item_name": "fatte",
+            "source_name": "Gudam",
+            "source_type": "storage",
+            "movement_date": "2026-10-07",
+            "movement_type": "gaye",
+            "movement_reason": "",
+            "destination_name": "Shop",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-07"
+        },
+        {
+          "tool": "record_work_log",
+          "args": {
+            "note": "",
+            "description": "5 kam nikle",
+            "labour_count": 5,
+            "activity_date": "2026-10-08",
+            "location_name": "",
+            "location_type": "shop"
+          },
+          "target_table": "work_logs",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "fatte",
+          "quantity": 50.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Gudam",
+          "destination_type": "storage",
+          "destination_name": "Shop",
+          "movement_type": "gaye",
+          "movement_reason": null,
+          "movement_date": "2026-10-07",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        },
+        {
+          "id": 1,
+          "location_type": "shop",
+          "location_name": null,
+          "description": "5 kam nikle",
+          "labour_count": 5,
+          "activity_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "work_logs"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "Gudam → shop",
+            "actions": [
+              "Gudam se 50 fatte shop gaye"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Shop pe 5 kam nikle",
+            "actions": [
+              "Shop pe 5 kam nikle"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Gudam",
+              "destination_type": "storage",
+              "destination_name": "Shop",
+              "item_name": "fatte",
+              "quantity": 50.0,
+              "unit": "",
+              "movement_type": "gaye",
+              "movement_reason": "",
+              "movement_date": "2026-10-07",
+              "note": "",
+              "reason": ""
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_work_log",
+            "args": {
+              "location_type": "shop",
+              "location_name": "",
+              "description": "5 kam nikle",
+              "labour_count": 5,
+              "activity_date": "2026-10-08",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: fatte, Qty: 50.0 \n➡️ Gudam → Shop\n✅ Work log record ho gaya.\n📍 Location: shop\n📝 Work: 5 kam nikle\n👷 Labour: 5",
+      "aborted": null,
+      "error": null,
+      "time_sec": 10.4
+    },
+    {
+      "test_id": "STK-E-08",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "SBI wali 2000 eent aaj gudam aayi, unme 100 tooti nikli",
+      "english": "The 2000 bricks from SBI came to the warehouse today, 100 of them were broken",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Supplier",
+          "tool": "record_supplier_transaction",
+          "args": {
+            "supplier_name": "SBI Bhatta",
+            "item_name": "eent",
+            "quantity": 2000,
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "eent",
+            "quantity_change": -100,
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "LOCATION_TYPE_CONFIRMATION",
+          "missing_field": null,
+          "location": "SBI wali",
+          "suggestions": [],
+          "answered": "supplier"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_supplier_transaction\n\nUpdated Arguments:\n{'supplier_name': 'SBI', 'transaction_date': datetime.date(2026, 10, 8), 'amount': None, 'item_name': 'eent', 'quantity': 2000.0, 'unit': None, 'rate': None, 'driver_name': None, 'destination_location': 'Gudam', 'customer_name': None, 'bill_id': None, 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_supplier_transaction\n\nUpdated Arguments:\n{'supplier_name': 'SBI', 'transaction_date': datetime.date(2026, 10, 8), 'amount': None, 'item_name': 'tooti eent', 'quantity': 100.0, 'unit': None, 'rate': None, 'driver_name': None, 'destination_location': 'Gudam', 'customer_name': None, 'bill_id': None, 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_supplier_transaction",
+          "args": {
+            "note": "",
+            "rate": 0.0,
+            "unit": "",
+            "amount": 0.0,
+            "bill_id": "",
+            "quantity": 2000.0,
+            "item_name": "eent",
+            "driver_name": "",
+            "customer_name": "",
+            "supplier_name": "SBI",
+            "transaction_date": "2026-10-08",
+            "destination_location": "Gudam"
+          },
+          "target_table": "supplier_transactions",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_supplier_transaction",
+          "args": {
+            "note": "",
+            "rate": 0.0,
+            "unit": "",
+            "amount": 0.0,
+            "bill_id": "",
+            "quantity": 100.0,
+            "item_name": "tooti eent",
+            "driver_name": "",
+            "customer_name": "",
+            "supplier_name": "SBI",
+            "transaction_date": "2026-10-08",
+            "destination_location": "Gudam"
+          },
+          "target_table": "supplier_transactions",
+          "target_id": 2,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "supplier_id": 2,
+          "customer_id": null,
+          "quantity": 2000.0,
+          "item_name": "eent",
+          "unit": null,
+          "rate": null,
+          "amount": null,
+          "driver_name": null,
+          "destination_location": "Gudam",
+          "transaction_date": "2026-10-08",
+          "bill_id": null,
+          "note": null,
+          "status": "active",
+          "_table": "supplier_transactions"
+        },
+        {
+          "id": 2,
+          "supplier_id": 2,
+          "customer_id": null,
+          "quantity": 100.0,
+          "item_name": "tooti eent",
+          "unit": null,
+          "rate": null,
+          "amount": null,
+          "driver_name": null,
+          "destination_location": "Gudam",
+          "transaction_date": "2026-10-08",
+          "bill_id": null,
+          "note": null,
+          "status": "active",
+          "_table": "supplier_transactions"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "SBI wali → gudam",
+            "actions": [
+              "SBI wali 2000 eent aaj gudam aayi",
+              "SBI wali 100 tooti eent aayi"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_supplier_transaction",
+            "args": {
+              "supplier_name": "SBI",
+              "transaction_date": "2026-10-08",
+              "amount": 0,
+              "item_name": "eent",
+              "quantity": 2000.0,
+              "unit": "",
+              "rate": 0,
+              "driver_name": "",
+              "destination_location": "Gudam",
+              "customer_name": "",
+              "bill_id": "",
+              "note": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          },
+          {
+            "group_id": "G1",
+            "tool": "record_supplier_transaction",
+            "args": {
+              "supplier_name": "SBI",
+              "transaction_date": "2026-10-08",
+              "amount": 0,
+              "item_name": "tooti eent",
+              "quantity": 100.0,
+              "unit": "",
+              "rate": 0,
+              "driver_name": "",
+              "destination_location": "Gudam",
+              "customer_name": "",
+              "bill_id": "",
+              "note": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Supplier transaction record ho gayi.\n🏢 Supplier: SBI\n📦 Item: eent\n🔢 Quantity: 2000.0\n💰 Amount: ₹-\n✅ Supplier transaction record ho gayi.\n🏢 Supplier: SBI\n📦 Item: tooti eent\n🔢 Quantity: 100.0\n💰 Amount: ₹-",
+      "aborted": null,
+      "error": null,
+      "time_sec": 9.1
+    },
+    {
+      "test_id": "STK-E-09",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "Sohan aaj gudam pe tha, 30 bori cement dukaan pahunchayi",
+      "english": "Sohan was at the warehouse today, delivered 30 bags of cement to the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": "Employee",
+          "tool": "record_attendance",
+          "args": {
+            "employee_name": "Sohan",
+            "attendance": "P",
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "cement",
+            "quantity": 30,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "material_movement",
+          "reason": "MISSING_FIELD",
+          "missing_field": "source",
+          "location": null,
+          "suggestions": [
+            "Gudam",
+            "Shop"
+          ],
+          "answered": "Pata nahi"
+        },
+        {
+          "type": "role",
+          "person": "Sohan",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Employee",
+              "found": true,
+              "confidence": 7.5
+            },
+            {
+              "no": 2,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.5
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.5
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.5
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 1.0
+            }
+          ],
+          "expected_role": "Employee",
+          "answered": "Employee"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_attendance\n\nUpdated Arguments:\n{'employee_name': 'Sohan', 'attendance': <AttendanceStatus.PRESENT: 'P'>, 'driving': <AttendanceStatus.ABSENT: 'absent'>, 'attendance_date': datetime.date(2026, 10, 8), 'note': 'gudam pe tha'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_attendance",
+          "args": {
+            "note": "gudam pe tha",
+            "driving": "absent",
+            "attendance": "P",
+            "employee_name": "Sohan",
+            "attendance_date": "2026-10-08"
+          },
+          "target_table": "attendance",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "employee_id": 2,
+          "attendance_date": "2026-10-08",
+          "attendance": "P",
+          "driving": "absent",
+          "note": "gudam pe tha",
+          "status": "active",
+          "_table": "attendance"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Sohan",
+            "actions": [
+              "Sohan aaj gudam pe tha"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Material Movement",
+            "identity_key": "UNKNOWN → dukaan",
+            "actions": [
+              "Sohan ne 30 bori cement dukaan pahunchayi"
+            ]
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Employee"
+        },
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_attendance",
+            "args": {
+              "employee_name": "Sohan",
+              "attendance": "P",
+              "driving": "absent",
+              "attendance_date": "2026-10-08",
+              "note": "gudam pe tha",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Sohan ki 2026-10-08 ki attendance record hui — Attendance: P, Driving: absent",
+      "aborted": null,
+      "error": null,
+      "time_sec": 9.1
+    },
+    {
+      "test_id": "STK-E-10",
+      "category": "E",
+      "lang": "hinglish",
+      "statement": "Gudam mein 15 bori cement zyada mili aur 10 chaukhat shop bhej di",
+      "english": "Found 15 extra bags of cement in the warehouse and sent 10 door frames to the shop",
+      "expected_outcome": "ENTRY",
+      "expected": [
+        {
+          "role": null,
+          "tool": "record_adjustment",
+          "args": {
+            "location": "gudam",
+            "item_name": "cement",
+            "quantity_change": 15,
+            "date": "T"
+          }
+        },
+        {
+          "role": null,
+          "tool": "record_material_movement",
+          "args": {
+            "item_name": "chaukhat",
+            "quantity": 10,
+            "source_name": "gudam",
+            "destination_name": "shop",
+            "date": "T"
+          }
+        }
+      ],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [],
+      "final_confirmations": [
+        "Tool: record_material_movement\n\nUpdated Arguments:\n{'source_type': 'storage', 'source_name': 'Gudam', 'destination_type': 'storage', 'destination_name': 'Shop', 'item_name': 'chaukhat', 'quantity': 10.0, 'unit': None, 'movement_type': 'bhej', 'movement_reason': None, 'movement_date': datetime.date(2026, 10, 8), 'note': None}\n\nExecute this tool? (yes/no)",
+        "Tool: record_adjustment\n\nUpdated Arguments:\n{'location': 'gudam', 'item_name': 'cement', 'unit': <InventoryUnit.BAG: 'bag'>, 'quantity_change': 15.0, 'reason': None, 'adjustment_date': datetime.date(2026, 10, 8), 'note': 'zyaada mili'}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_material_movement",
+          "args": {
+            "note": "",
+            "unit": "",
+            "quantity": 10.0,
+            "item_name": "chaukhat",
+            "source_name": "Gudam",
+            "source_type": "storage",
+            "movement_date": "2026-10-08",
+            "movement_type": "bhej",
+            "movement_reason": "",
+            "destination_name": "Shop",
+            "destination_type": "storage"
+          },
+          "target_table": "material_movements",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        },
+        {
+          "tool": "record_adjustment",
+          "args": {
+            "note": "zyaada mili",
+            "unit": "bag",
+            "reason": "",
+            "location": "gudam",
+            "item_name": "cement",
+            "adjustment_date": "2026-10-08",
+            "quantity_change": 15.0
+          },
+          "target_table": "stock_adjustments",
+          "target_id": 3,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "item_name": "chaukhat",
+          "quantity": 10.0,
+          "unit": null,
+          "source_type": "storage",
+          "source_name": "Gudam",
+          "destination_type": "storage",
+          "destination_name": "Shop",
+          "movement_type": "bhej",
+          "movement_reason": null,
+          "movement_date": "2026-10-08",
+          "note": null,
+          "status": "active",
+          "_table": "material_movements"
+        },
+        {
+          "id": 3,
+          "location": "gudam",
+          "item_name": "सीमेंट",
+          "unit": "bag",
+          "quantity_change": 15.0,
+          "reason": null,
+          "related_party": null,
+          "source_table": null,
+          "source_id": null,
+          "adjustment_date": "2026-10-08",
+          "note": "zyaada mili",
+          "status": "active",
+          "_table": "stock_adjustments"
+        }
+      ],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Material Movement",
+            "identity_key": "Gudam → shop",
+            "actions": [
+              "Gudam se 10 chaukhat shop bhej di"
+            ]
+          },
+          {
+            "group_id": "G2",
+            "record_type": "Standalone Transaction",
+            "identity_key": "Gudam mein 15 bori cement zyada mili",
+            "actions": [
+              "Gudam mein 15 bori cement zyada mili"
+            ]
+          }
+        ],
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_material_movement",
+            "args": {
+              "source_type": "storage",
+              "source_name": "Gudam",
+              "destination_type": "storage",
+              "destination_name": "Shop",
+              "item_name": "chaukhat",
+              "quantity": 10.0,
+              "unit": "",
+              "movement_type": "bhej",
+              "movement_reason": "",
+              "movement_date": "2026-10-08",
+              "note": "",
+              "reason": ""
+            }
+          },
+          {
+            "group_id": "G2",
+            "tool": "record_adjustment",
+            "args": {
+              "location": "gudam",
+              "item_name": "cement",
+              "unit": "bag",
+              "quantity_change": 15.0,
+              "reason": "",
+              "adjustment_date": "2026-10-08",
+              "note": "zyaada mili",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": ""
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Material movement record ho gaya.\n📦 Item: chaukhat, Qty: 10.0 \n➡️ Gudam → Shop\n✅ Stock adjustment record ho gaya.\n📍 Location: gudam\n📦 Item: सीमेंट\n🔢 Change: 15.0 bag\n📝 Reason: -",
+      "aborted": null,
+      "error": null,
+      "time_sec": 12.6
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "sliced_prompt": true,
+  "finished": "2026-10-08T06:27:08.391881"
+}

@@ -6,6 +6,8 @@ LOCATION_ALIASES = {
     "gudam": "गोदाम",
     "godam": "गोदाम",
     "warehouse": "गोदाम",
+    "godown": "गोदाम",
+    "gudaam": "गोदाम",
     "गोदाम": "गोदाम",
 
     "palate": "पलाट",

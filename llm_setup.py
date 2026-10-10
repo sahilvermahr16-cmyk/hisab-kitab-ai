@@ -8,6 +8,8 @@ from tools import (
     record_adjustment, record_work_log, record_material_movement,
     record_expense, record_expense_payment,
     record_purchase, record_purchase_payment,
+    record_opening_balance,
+    record_family_transaction,
 )
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
@@ -34,6 +36,10 @@ TOOLS_MAP = {
 
     "record_purchase": record_purchase,
     "record_purchase_payment": record_purchase_payment,
+
+    "record_opening_balance": record_opening_balance,
+
+    "record_family_transaction": record_family_transaction,
 }
 
 llm_with_tools = llm.bind_tools(list(TOOLS_MAP.values()))

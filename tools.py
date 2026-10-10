@@ -14,7 +14,7 @@ from models import (
 import traceback
 from helpers import (get_or_create_employee, get_or_create_customer, get_or_create_supplier, add_cash_ledger_entry, 
     update_stock_history, update_inventory_stock, sync_movement_entity, sync_person_role,)
-from models import MovementEntityType
+from models import MovementEntityType, OpeningBalance, CashLedger, FamilyTransaction
 from item_mapper import normalize_item
 
 # -- Employee Tools
@@ -313,27 +313,30 @@ def record_attendance(employee_name: str, attendance_date: str, attendance: str 
         employee = get_or_create_employee(employee_name)
         date_obj = datetime.strptime(attendance_date, "%Y-%m-%d").date()
 
-        existing = db.query(Attendance).filter(
+        # Ek din ki attendance dobara aaye to purani row ko BADLO mat — nayi row
+        # banao aur purani ko "corrected" (superseded) karo. Overwrite karne se
+        # Correction ka "naya statement" flow toot jaata tha: nayi entry purani
+        # row ko hi badal deti thi, aur fir purani ko reverse karte hi nayi bhi
+        # chali jaati thi. Ab har attendance ki apni row hai, history bhi bachi rehti hai.
+        previous = db.query(Attendance).filter(
             Attendance.employee_id == employee.id,
-            Attendance.attendance_date == date_obj
-        ).first()
+            Attendance.attendance_date == date_obj,
+            Attendance.status == "active",
+            Attendance.reversal_of_id.is_(None),
+        ).order_by(Attendance.id).all()
 
-        if existing:
-            existing.attendance = attendance
-            existing.driving = driving
-            if note:
-                existing.note = note
-            row = existing
-        else:
-            row = Attendance(
-                employee_id=employee.id,
-                attendance_date=date_obj,
-                attendance=attendance,
-                driving=driving,
-                note=note
-            )
-            db.add(row)
-            db.flush()
+        row = Attendance(
+            employee_id=employee.id,
+            attendance_date=date_obj,
+            attendance=attendance,
+            driving=driving,
+            note=note or (previous[-1].note if previous else None),
+        )
+        db.add(row)
+        db.flush()
+        for old_row in previous:
+            old_row.status = "corrected"
+            old_row.superseded_by_id = row.id
 
         db.commit()
         return {
@@ -764,11 +767,13 @@ def record_supplier_transaction(supplier_name: str, transaction_date: str, amoun
             supplier_id=supplier.id,
             customer_id=customer.id if customer else None,
             destination_location=destination_location or None,
-            quantity=quantity if quantity > 0 else None,
+            # != 0 (na ki > 0): Correction-reversal minus quantity/amount ke
+            # saath isi tool ko chalata hai — tab bhi row aur inventory sahi bane.
+            quantity=quantity if quantity != 0 else None,
             item_name=item_name or None,
             unit=unit or None,
             rate=rate if rate > 0 else None,
-            amount=amount if amount > 0 else None,
+            amount=amount if amount != 0 else None,
             driver_name=driver_name or None,
             transaction_date=datetime.strptime(
                 transaction_date,
@@ -781,14 +786,14 @@ def record_supplier_transaction(supplier_name: str, transaction_date: str, amoun
         db.flush()
 
         # Supplier ka maal inventory mein aaya hai
-        if not customer_name and destination_location and quantity > 0:
+        if not customer_name and destination_location and quantity != 0:
             update_stock_history(
                 db=db,
                 location=destination_location,
                 item_name=item_name,
                 unit=unit,
                 quantity_change=quantity,
-                reason="supplier_in",
+                reason="supplier_in" if quantity > 0 else "supplier_return",
                 related_party=supplier_name,
                 source_table="supplier_transactions",
                 source_id=tx.id,
@@ -1516,3 +1521,182 @@ def record_material_movement(
     finally:
         db.close()
 
+
+# --- Opening Balance Tool (Reporting Phase)
+
+def _earliest_entry_date(db, party_type, party_id):
+    """Is khaate ki sabse pehli (active) entry ki date — opening hamesha usse pehle/usi din ka."""
+    from reports import queries as Q
+    dates = []
+    if party_type == "employee":
+        dates += [t.transaction_date for t in Q.employee_transactions(db, employee_id=party_id)]
+    elif party_type == "customer":
+        dates += [t.sale_date for t in Q.sales_transactions(db, customer_id=party_id)]
+        dates += [p.payment_date for p in Q.sales_payments(db, customer_id=party_id)]
+    elif party_type == "supplier":
+        dates += [t.transaction_date for t in Q.supplier_transactions(db, supplier_id=party_id)]
+        dates += [p.payment_date for p in Q.supplier_payments(db, supplier_id=party_id)]
+    elif party_type == "cash":
+        dates += [row.entry_date for row, _ in Q.cash_entries(db)]
+    dates = [d for d in dates if d is not None]
+    return min(dates) if dates else None
+
+
+@tool
+def record_opening_balance(party_type: str, amount: float, direction: str = "", party_name: str = "",
+                           as_of_date: str = "", note: str = ""):
+    """
+    Record an OLD balance from BEFORE Hisab-Kitab started — a one-time
+    starting figure for a party, or the starting cash in hand.
+
+    party_type: employee | customer | supplier | cash
+    direction : lena  → humein us party se lena hai
+                dena  → humein us party ko dena hai
+                (cash ke liye direction ki zaroorat nahi)
+
+    Examples:
+    "Suresh Traders pe pehle ka 6000 udhaar hai"
+        => party_type="customer", party_name="Suresh Traders", amount=6000, direction="lena"
+    "Jai Bhatte ko pichla 5000 dena baaki hai"
+        => party_type="supplier", party_name="Jai Bhatta", amount=5000, direction="dena"
+    "Ram ne pehle 2000 advance le rakha hai"
+        => party_type="employee", party_name="Ram", amount=2000, direction="lena"
+    "Shuru mein galle mein 40000 cash tha"
+        => party_type="cash", amount=40000
+
+    Rules:
+    1. Ek khaate ka ek hi opening balance. Pehle se hai to naya nahi banta —
+       badalna ho to Correction se ("Suresh ka opening balance galat hai").
+    2. Opening hamesha us khaate ki pehli entry se pehle (ya usi din) ka hota hai.
+       Date na di ho, ya pehli entry ke baad ki ho, to pehli entry ki date le li jaati hai.
+    3. Ye CashLedger mein entry NAHI banata — ye purana baaki hai, aaj ka len-den nahi.
+    """
+    from helpers import mark_months_dirty
+    db = SessionLocal()
+    try:
+        pt = (party_type or "").strip().lower()
+        if pt not in ("employee", "customer", "supplier", "cash"):
+            return "Error: party_type employee, customer, supplier ya cash hona chahiye."
+        if amount is None or amount <= 0:
+            return "Error: amount 0 se zyada hona chahiye."
+        direction = (direction or "").strip().lower()
+        if pt == "cash":
+            direction = "cash"
+        elif direction not in ("lena", "dena"):
+            return "Error: direction 'lena' ya 'dena' hona chahiye."
+
+        party_id, shown = 0, "Cash (galla)"
+        if pt != "cash":
+            name = (party_name or "").strip()
+            if not name:
+                return "Error: party ka naam chahiye."
+            if pt == "employee":
+                party = get_or_create_employee(name, db)
+            elif pt == "customer":
+                party = get_or_create_customer(name, db)
+            else:
+                party = get_or_create_supplier(name, db)
+            db.flush()
+            party_id, shown = party.id, party.name
+
+        existing = (db.query(OpeningBalance)
+                    .filter(OpeningBalance.ledger_type == pt, OpeningBalance.ledger_id == party_id,
+                            OpeningBalance.status == "active", OpeningBalance.reversal_of_id.is_(None))
+                    .first())
+        if existing is not None:
+            db.rollback()
+            return (f"ℹ️ {shown} ka purana baaki pehle se ₹{existing.amount:,.0f} "
+                    f"({existing.direction}, {existing.as_of_date}) likha hai — dobara nahi likha. "
+                    f"Badalna ho to correction karo, jaise: '{shown} ka opening balance galat hai'.")
+
+        today = date.today()
+        try:
+            as_of = datetime.strptime(as_of_date, "%Y-%m-%d").date() if as_of_date else today
+        except ValueError:
+            as_of = today
+        earliest = _earliest_entry_date(db, pt, party_id)
+        if earliest is not None and earliest < as_of:
+            as_of = earliest
+
+        row = OpeningBalance(ledger_type=pt, ledger_id=party_id, amount=amount, direction=direction,
+                             as_of_date=as_of, note=(note or "").strip() or None)
+        db.add(row)
+        db.flush()
+        mark_months_dirty(db, as_of)          # is mahine se aage ki closing dobara banegi
+        db.commit()
+
+        if pt == "cash":
+            msg = f"✅ Shuru ka cash ₹{amount:,.0f} ({as_of}) record ho gaya."
+        else:
+            word = "lena" if direction == "lena" else "dena"
+            msg = f"✅ {shown} ka purana baaki ₹{amount:,.0f} {word} ({as_of}) record ho gaya."
+        return {"message": msg, "target_table": "opening_balances", "target_id": row.id}
+    except Exception as e:
+        traceback.print_exc()
+        db.rollback()
+        return f"Error: {e}"
+    finally:
+        db.close()
+
+
+# -- Family Tools
+
+@tool
+def record_family_transaction(member_name: str, transaction_type: str, amount: float, transaction_date: str = "",
+                              purpose: str = "", relation: str = "", note: str = ""):
+    """
+    Record money between the BUSINESS galla and a FAMILY member (ghar ke log).
+    Ye lena-dena / udhaar nahi hai — sirf family kharcha ka hisab.
+
+    transaction_type:
+    - kharcha → business ke galle se paisa GHAR gaya (family member ne liya / ghar ke liye nikala) — cash OUT
+    - jama    → family member ne business ke galle mein paisa DAALA / wapas kiya — cash IN
+
+    Examples:
+    "Papa ne ghar ke liye 5000 liye"        => member_name="Papa", transaction_type="kharcha", amount=5000, purpose="ghar"
+    "Bhai ki fees ke 12000 diye"            => member_name="Bhai", transaction_type="kharcha", amount=12000, purpose="fees"
+    "Mummy ne galle mein 3000 daale"        => member_name="Mummy", transaction_type="jama", amount=3000
+    "Rohit (bhai) ko 2000 diye"             => member_name="Rohit", relation="bhai", transaction_type="kharcha", amount=2000
+
+    Rules:
+    1. Galle ke hisaab se: galle se gaya = kharcha, galle mein aaya = jama.
+       "X ne liye" = X ne galle se liye = kharcha.
+    2. Date nahi hai to aaj ki date (YYYY-MM-DD).
+    3. CashLedger mein entry banti hai (kharcha → OUT, jama → IN).
+    """
+    db = SessionLocal()
+    try:
+        from helpers import get_or_create_family_member
+        tt = (transaction_type or "").strip().lower()
+        tt = {"diya": "kharcha", "liya": "jama"}.get(tt, tt)     # purane naam bhi chalein
+        if tt not in ("kharcha", "jama"):
+            return "Error: transaction_type 'kharcha' ya 'jama' hona chahiye."
+        if amount is None or amount <= 0:
+            return "Error: amount 0 se zyada hona chahiye."
+        name = (member_name or "").strip()
+        if not name:
+            return "Error: family member ka naam chahiye."
+        date_obj = datetime.strptime(transaction_date, "%Y-%m-%d").date() if transaction_date else date.today()
+
+        member = get_or_create_family_member(name, db, relation=relation or "")
+        tx = FamilyTransaction(member_id=member.id, transaction_type=tt, amount=amount,
+                               transaction_date=date_obj, purpose=(purpose or "").strip() or None,
+                               note=(note or "").strip() or None)
+        db.add(tx)
+        db.flush()
+        add_cash_ledger_entry(db=db, entry_date=date_obj, direction="out" if tt == "kharcha" else "in",
+                              amount=amount, category="family", source_table="family_transactions",
+                              source_id=tx.id, note=purpose or note or "")
+        db.commit()
+        if tt == "kharcha":
+            msg = (f"✅ {member.name} ko ₹{amount:,.0f} family kharcha record ho gaya"
+                   + (f" ({purpose})" if purpose else "") + ".\n💰 Galle se ₹{:,.0f} cash OUT.".format(amount))
+        else:
+            msg = f"✅ {member.name} se ₹{amount:,.0f} galle mein aaye — record ho gaya.\n💰 Cash IN ₹{amount:,.0f}."
+        return {"message": msg, "target_table": "family_transactions", "target_id": tx.id}
+    except Exception as e:
+        traceback.print_exc()
+        db.rollback()
+        return f"Error: {e}"
+    finally:
+        db.close()

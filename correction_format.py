@@ -8,6 +8,8 @@ HEADERS = {
     "supplier": ("Diya", "Maal"),
     "purchase": ("Diya", "Deal"),
     "expense": ("Kharcha", "Diya"),
+    "opening": ("Lena", "Dena"),
+    "family": ("Diya", "Liya"),
 }
 DEFAULT_HEADERS = ("Debit", "Credit")
 
@@ -22,6 +24,8 @@ BALANCE = {
 TITLES = {
     "employee": "EMPLOYEE", "customer": "CUSTOMER", "supplier": "SUPPLIER",
     "purchase": "PURCHASE", "expense": "EXPENSE", "material_movement": "MATERIAL / STOCK",
+    "opening": "OPENING BALANCE",
+    "family": "FAMILY KHARCHA",
 }
 
 
@@ -88,6 +92,19 @@ def to_view(row: dict) -> dict:
     elif tool == "record_work_log":
         typ = "Kaam log"
         info.append(f"{a.get('description', '')} ({a.get('labour_count') or '-'} labour)")
+    elif tool == "record_opening_balance":
+        typ = "Purana baaki"
+        if a.get("direction") == "dena":
+            credit = amount
+        else:
+            debit = amount
+        info.append(f"{a.get('party_type', '')} — {a.get('direction', '')}")
+    elif tool == "record_family_transaction":
+        if a.get("transaction_type") in ("jama", "liya"):
+            typ, credit = "Galle mein aaya", amount
+        else:
+            typ, debit = "Ghar ko diya", amount
+        info.append(a.get("purpose") or "")
     elif tool == "record_adjustment":
         typ = "Stock adj."
         info.append(_join(a.get("item_name"), a.get("quantity_change"), a.get("unit")))
@@ -97,7 +114,7 @@ def to_view(row: dict) -> dict:
 
     return {
         "date": _fmt_date(row.get("entry_date")),
-        "party": row.get("person_name") or a.get("description") or "-",
+        "party": row.get("person_name") or a.get("description") or ("Cash" if tool == "record_opening_balance" else "-"),
         "type": typ,
         "entry": row.get("voucher") or f"#{row['id']}",
         "debit": debit or None,

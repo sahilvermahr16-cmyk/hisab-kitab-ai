@@ -79,4 +79,15 @@ class ArgumentField(str, Enum):
     MOVEMENT_TYPE = "movement_type"
     MOVEMENT_REASON = "movement_reason"
 
+    # Opening balance
+    PARTY_TYPE = "party_type"
+    PARTY_NAME = "party_name"
+    DIRECTION = "direction"
+    AS_OF_DATE = "as_of_date"
+
+    # Family
+    MEMBER_NAME = "member_name"
+    PURPOSE = "purpose"
+    RELATION = "relation"
+
     

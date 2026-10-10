@@ -53,6 +53,33 @@ class Attendance(Base):
     reversal_of_id = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+# --- Family Part (ghar ke log — papa, bhai, mummy...)
+# Business ke galle se ghar ke liye paisa gaya ("kharcha") ya ghar se business mein
+# paisa aaya ("jama"). Ye lena-dena nahi hai — sirf family kharcha ka hisab.
+
+class FamilyMember(Base):
+    __tablename__ = "family_members"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, nullable=False)
+    relation = Column(String, nullable=True)     # papa / bhai / mummy ... (agar bataya)
+    business_id = Column(Integer, default=1, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class FamilyTransaction(Base):
+    __tablename__ = "family_transactions"
+    id = Column(Integer, primary_key=True)
+    member_id = Column(Integer, ForeignKey("family_members.id"))
+    transaction_type = Column(String)   # "kharcha" (galle se ghar gaya, cash OUT) / "jama" (galle mein aaya, cash IN)
+    amount = Column(Float)
+    transaction_date = Column(Date)
+    purpose = Column(String, nullable=True)   # kis kaam ke liye (ghar ka saman, fees, ...)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 # --- sales Part
 
 class Customer(Base):
@@ -373,20 +400,79 @@ class AuditLog(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+# =====================================================================
+# --- Reporting Phase
+# =====================================================================
+
+# Hisab-Kitab shuru hone se PEHLE ka purana lena-dena / cash — ek baar
+# record_opening_balance tool se aata hai. Ek ledger ka ek hi active row.
+#   ledger_type: "supplier" | "customer" | "employee" | "cash"
+#   ledger_id  : us party ka id (cash ke liye 0)
+#   direction  : "lena" (humein milna hai) | "dena" (humein dena hai)
+#                cash ke liye "cash" (haath mein itna tha)
+class OpeningBalance(Base):
+    __tablename__ = "opening_balances"
+    id = Column(Integer, primary_key=True)
+    ledger_type = Column(String, nullable=False)
+    ledger_id = Column(Integer, nullable=False, default=0)
+    amount = Column(Float, nullable=False)
+    direction = Column(String, nullable=False)
+    as_of_date = Column(Date, nullable=False)
+    note = Column(Text, nullable=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    status = Column(String, default="active", nullable=False)
+    superseded_by_id = Column(Integer, nullable=True)
+    reversal_of_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
+# Har mahine ka "closing" status — ek row per mahina.
+#   status: "closed" (calculate ho chuka, sahi hai)
+#           "dirty"  (purani date ki entry/correction aayi — dobara calculate karo)
+class MonthClose(Base):
+    __tablename__ = "month_close"
+    id = Column(Integer, primary_key=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    year_month = Column(String, nullable=False)        # "2026-09"
+    status = Column(String, default="dirty", nullable=False)
+    computed_at = Column(DateTime, nullable=True)
+    __table_args__ = (UniqueConstraint('business_id', 'year_month', name='uq_month_close'),)
 
 
+# Har mahine, har khaate ki opening / debit / credit / closing.
+#   ledger_type: supplier | customer | employee | cash | purchase | expense
+#                | work_log | material
+#   ledger_id  : party id (category khaaton ke liye 0)
+#   Sign convention (sab ledgers ke liye ek jaisa):
+#       balance > 0  → humein LENA hai
+#       balance < 0  → humein DENA hai
+#       cash ke liye balance = haath mein cash
+#   extra: category-wise breakup (expense mad-wise, maal item-wise qty, ...)
+class MonthlyClosing(Base):
+    __tablename__ = "monthly_closing"
+    id = Column(Integer, primary_key=True)
+    business_id = Column(Integer, default=1, nullable=False)
+    year_month = Column(String, nullable=False)
+    ledger_type = Column(String, nullable=False)
+    ledger_id = Column(Integer, nullable=False, default=0)
+    opening = Column(Float, nullable=False, default=0)
+    debit_total = Column(Float, nullable=False, default=0)
+    credit_total = Column(Float, nullable=False, default=0)
+    closing = Column(Float, nullable=False, default=0)
+    txn_count = Column(Integer, nullable=False, default=0)
+    extra = Column(JSONB, nullable=True)
+    computed_at = Column(DateTime, default=datetime.utcnow)
+    __table_args__ = (UniqueConstraint('business_id', 'year_month', 'ledger_type', 'ledger_id',
+                                       name='uq_monthly_closing'),)
 
 
-
-
-
-
-
-
-
-
-
-
-
+# Report ke free-text values (item, note, naam) ka Hindi/English
+# translation — ek baar LLM se, fir yahin se.
+class TranslationCache(Base):
+    __tablename__ = "translation_cache"
+    id = Column(Integer, primary_key=True)
+    source_text = Column(Text, nullable=False)
+    lang = Column(String, nullable=False)              # "hi" | "en"
+    translated_text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    __table_args__ = (UniqueConstraint('source_text', 'lang', name='uq_translation'),)

@@ -36,6 +36,18 @@ def merge_lists(existing: list | None, new) -> list:
     return existing + new
 
 
+def keep_last(existing, new):
+    """single_group: har branch apna group likhti hai. Do maal-movement ek saath chalein to
+    ek hi step mein do jawaab aate hain — aakhri rakh lo (fan-in ke baad isko koi nahi padhta)."""
+    return new
+
+
+def _keep_statement(old, new):
+    """Kai parallel material-movement branch ek hi statement wapas likhte hain — ek hi value rakho
+    (warna LangGraph: 'Can receive only one value per step')."""
+    return new if new else old
+
+
 class ChatState(TypedDict):
 
     messages: Annotated[list, add_messages]
@@ -44,7 +56,7 @@ class ChatState(TypedDict):
     extracted_intent: UserIntent | None
     grouped_intent: GroupedIntent | None
 
-    single_group: ActionGroup | None
+    single_group: Annotated[ActionGroup | None, keep_last]
     tool_argument_updates: list | None
 
     # Annotated must be the OUTERMOST type — never wrap in `| None`.
@@ -69,12 +81,15 @@ class ChatState(TypedDict):
 
     correction_data: dict | None
 
+    # Reporting Phase — report_subgraph ka apna data (sirf JSON-safe values)
+    report_data: dict | None
+
     execution_result: dict | None
     error: str | None
 
-    original_user_statement: str | None
+    original_user_statement: Annotated[str | None, _keep_statement]
     missing_arguments: list | None
 
 
 
-    
+    

@@ -2473,7 +2473,3 @@ async def person_role_classification_node(state):
     rankings = await asyncio.gather(*(classify(g) for g in groups))
 
     return {"person_role_rankings": list(rankings)}
-
-
-
-    

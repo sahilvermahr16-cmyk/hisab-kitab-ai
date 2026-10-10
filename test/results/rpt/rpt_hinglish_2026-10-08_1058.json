@@ -1,0 +1,852 @@
+{
+  "bundle": "Report",
+  "lang": "hinglish",
+  "started": "2026-10-08T10:58:20.350767",
+  "test_date_T": "2026-10-08",
+  "date_tokens": {
+    "T": "2026-10-08",
+    "T-1": "2026-10-07",
+    "T-2": "2026-10-06",
+    "LAST_MONDAY": "2026-10-05",
+    "LAST_SATURDAY": "2026-10-03"
+  },
+  "database": "hisab_test",
+  "filters": {
+    "only": "",
+    "category": ""
+  },
+  "skipped_no_statement": [],
+  "results": [
+    {
+      "test_id": "RPT-A-01",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Zara Sharma ji wala khata kholo, poora lena dena dekhna hai",
+      "english": "Open Sharma ji's account, want to see all dues",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Zara Sharma ji wala khata kholo, poora lena dena dekhna hai",
+          "kind": "person",
+          "person_name": "Zara Sharma",
+          "role": null,
+          "stop": "'Zara Sharma' ka koi hisab nahi hai."
+        }
+      },
+      "bot_reply": "'Zara Sharma' ka koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 3.6
+    },
+    {
+      "test_id": "RPT-A-02",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Suresh Traders pe hamara kitna udhaar chadha hua hai abhi",
+      "english": "How much credit is outstanding on Suresh Traders right now",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "role",
+          "question": "'Suresh Traders' humein Customer mein mila — isi ka hisab?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Suresh Traders pe hamara kitna udhaar chadha hua hai abhi",
+          "kind": "person",
+          "person_name": "Suresh Traders",
+          "role": null,
+          "found_roles": [
+            "customer"
+          ]
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: role",
+      "error": null,
+      "time_sec": 2.9
+    },
+    {
+      "test_id": "RPT-A-03",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Bhatte wale SBI ki pichle 14 dino ki entries ka report bana do",
+      "english": "Make a report of the last 14 days' entries of SBI kiln",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Bhatte wale SBI ki pichle 14 dino ki entries ka report bana do",
+          "kind": "cash_flow",
+          "start": "2026-09-25",
+          "end": "2026-10-08",
+          "stop": "Is duration (25-Sep-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+          "checked": true
+        }
+      },
+      "bot_reply": "Is duration (25-Sep-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 2.8
+    },
+    {
+      "test_id": "RPT-A-04",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Is mahine Ram ko kya kya diya aur kitna kaam kiya, report do",
+      "english": "Give a report of what Ram was paid and how much he worked this month",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "role",
+          "question": "'Ram' humein Employee mein mila — isi ka hisab?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Is mahine Ram ko kya kya diya aur kitna kaam kiya, report do",
+          "kind": "person",
+          "person_name": "Ram",
+          "role": null,
+          "start": "2026-10-01",
+          "end": "2026-10-08",
+          "found_roles": [
+            "employee"
+          ]
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: role",
+      "error": null,
+      "time_sec": 2.6
+    },
+    {
+      "test_id": "RPT-A-05",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "Kitanu ka khata dikhao English mein",
+      "english": "Show Kitanu's account in English",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "role",
+          "question": "'kitanu' humein Employee mein mila — isi ka hisab?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Kitanu ka khata dikhao English mein",
+          "kind": "person",
+          "person_name": "kitanu",
+          "role": null,
+          "lang": "en",
+          "found_roles": [
+            "employee"
+          ]
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: role",
+      "error": null,
+      "time_sec": 5.3
+    },
+    {
+      "test_id": "RPT-A-06",
+      "category": "A",
+      "lang": "hinglish",
+      "statement": "1 se 15 september tak Suresh Traders ka hisab",
+      "english": "Suresh Traders' account from 1 to 15 September",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "role",
+          "question": "'Suresh Traders' humein Customer mein mila — isi ka hisab?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "1 se 15 september tak Suresh Traders ka hisab",
+          "kind": "person",
+          "person_name": "Suresh Traders",
+          "role": null,
+          "start": "2026-09-01",
+          "end": "2026-09-15",
+          "found_roles": [
+            "customer"
+          ]
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: role",
+      "error": null,
+      "time_sec": 3.0
+    },
+    {
+      "test_id": "RPT-B-01",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "October mein dukaan ke kharchon ki list nikalo",
+      "english": "List the shop's expenses in October",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "October mein dukaan ke kharchon ki list nikalo",
+          "kind": "expense",
+          "start": "2026-10-01",
+          "end": "2026-10-08",
+          "stop": "Is duration (01-Oct-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+          "checked": true
+        }
+      },
+      "bot_reply": "Is duration (01-Oct-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 3.1
+    },
+    {
+      "test_id": "RPT-B-02",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Aaj galle mein kitna cash aaya aur kitna gaya",
+      "english": "How much cash came in and went out of the till today",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Aaj galle mein kitna cash aaya aur kitna gaya",
+          "kind": "cash_flow",
+          "start": "2026-10-08",
+          "end": "2026-10-08",
+          "stop": "Is duration (08-Oct-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+          "checked": true
+        }
+      },
+      "bot_reply": "Is duration (08-Oct-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 3.3
+    },
+    {
+      "test_id": "RPT-B-03",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Pichle mahine ka poore business ka hisab chahiye",
+      "english": "Need the whole business account for last month",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "language",
+          "question": "Report kis bhasha mein chahiye?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Pichle mahine ka poore business ka hisab chahiye",
+          "kind": "overall",
+          "start": "2026-09-01",
+          "end": "2026-09-30",
+          "checked": true
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: language",
+      "error": null,
+      "time_sec": 2.5
+    },
+    {
+      "test_id": "RPT-B-04",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Kal kis din kya kaam hua site pe, register dikhao",
+      "english": "Show the register of what work happened at the site yesterday",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Kal kis din kya kaam hua site pe, register dikhao",
+          "kind": "work_log",
+          "start": "2026-10-07",
+          "end": "2026-10-07",
+          "stop": "Is duration (07-Oct-2026 se 07-Oct-2026) mein koi hisab nahi hai.",
+          "checked": true
+        }
+      },
+      "bot_reply": "Is duration (07-Oct-2026 se 07-Oct-2026) mein koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 2.2
+    },
+    {
+      "test_id": "RPT-B-05",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Sitambar mahine ki maal aawajahi ki report",
+      "english": "Report of material movement in September",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Sitambar mahine ki maal aawajahi ki report",
+          "kind": "material_movement",
+          "start": "2026-09-01",
+          "end": "2026-09-30",
+          "stop": "Is duration (01-Sep-2026 se 30-Sep-2026) mein koi hisab nahi hai.",
+          "checked": true
+        }
+      },
+      "bot_reply": "Is duration (01-Sep-2026 se 30-Sep-2026) mein koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 3.6
+    },
+    {
+      "test_id": "RPT-B-06",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Property wale saudon ka hisab dikha do",
+      "english": "Show the account of the property deals",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "range",
+          "question": "Kitne din ka hisab dekhna hai?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Property wale saudon ka hisab dikha do",
+          "kind": "purchase"
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: range",
+      "error": null,
+      "time_sec": 2.8
+    },
+    {
+      "test_id": "RPT-B-07",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Pichle 7 dino mein galle se kya aaya kya gaya",
+      "english": "What came into and went out of the till in the last 7 days",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Pichle 7 dino mein galle se kya aaya kya gaya",
+          "kind": "cash_flow",
+          "start": "2026-10-01",
+          "end": "2026-10-08",
+          "stop": "Is duration (01-Oct-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+          "checked": true
+        }
+      },
+      "bot_reply": "Is duration (01-Oct-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 2.5
+    },
+    {
+      "test_id": "RPT-B-08",
+      "category": "B",
+      "lang": "hinglish",
+      "statement": "Pichle 3 mahine ki kharid ka hisab",
+      "english": "Account of purchases in the last 3 months",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Pichle 3 mahine ki kharid ka hisab",
+          "kind": "purchase",
+          "start": "2026-07-08",
+          "end": "2026-10-08",
+          "stop": "Is duration (08-Jul-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+          "checked": true
+        }
+      },
+      "bot_reply": "Is duration (08-Jul-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 2.5
+    },
+    {
+      "test_id": "RPT-C-01",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "ek report bana do bhai",
+      "english": "make a report",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "kind",
+          "question": "Kiska hisab dekhna hai?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "ek report bana do bhai",
+          "kind": null
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: kind",
+      "error": null,
+      "time_sec": 2.3
+    },
+    {
+      "test_id": "RPT-C-02",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Ghar ka kharcha is saal kitna gaya",
+      "english": "How much household spending went this year",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "name",
+          "question": "Kis family member ka hisab? Naam likho, ya list mein se number chuno."
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Ghar ka kharcha is saal kitna gaya",
+          "kind": "person",
+          "person_name": null,
+          "role": "family",
+          "start": "2026-01-01",
+          "end": "2026-10-08"
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: name",
+      "error": null,
+      "time_sec": 2.4
+    },
+    {
+      "test_id": "RPT-C-03",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "Papa ne is mahine kitne paise liye, dikhao",
+      "english": "Show how much money Papa took this month",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "Papa ne is mahine kitne paise liye, dikhao",
+          "kind": "cash_flow",
+          "start": "2026-10-01",
+          "end": "2026-10-08",
+          "stop": "Is duration (01-Oct-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+          "checked": true
+        }
+      },
+      "bot_reply": "Is duration (01-Oct-2026 se 08-Oct-2026) mein koi hisab nahi hai.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 2.3
+    },
+    {
+      "test_id": "RPT-C-04",
+      "category": "C",
+      "lang": "hinglish",
+      "statement": "sohan ki puri entri dkhao bhai",
+      "english": "show all of sohan's entries",
+      "expected_outcome": "REPORT",
+      "expected": [],
+      "expected_ask": null,
+      "route": "report",
+      "questions": [
+        {
+          "type": "report",
+          "step": "role",
+          "question": "'sohan' humein Employee mein mila — isi ka hisab?"
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "report",
+        "report_data": {
+          "text": "sohan ki puri entri dkhao bhai",
+          "kind": "person",
+          "person_name": "sohan",
+          "role": null,
+          "found_roles": [
+            "employee"
+          ]
+        }
+      },
+      "bot_reply": null,
+      "aborted": "report: role",
+      "error": null,
+      "time_sec": 2.3
+    },
+    {
+      "test_id": "RPT-D-01",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Sharma ji ka hisab clear ho gaya, 4000 de gaye",
+      "english": "Sharma ji's account is cleared, he paid 4000",
+      "expected_outcome": "ENTRY",
+      "expected": [],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Sharma ji",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Customer",
+              "found": true,
+              "confidence": 0.0
+            },
+            {
+              "no": 2,
+              "role": "Employee",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 0.0
+            }
+          ],
+          "expected_role": "Customer",
+          "answered": "Customer"
+        },
+        {
+          "type": "missing_argument",
+          "tool": "record_sale_payment",
+          "missing": [
+            "customer_name"
+          ],
+          "arguments": {
+            "customer_name": null,
+            "amount": 4000.0,
+            "payment_date": "2026-10-08",
+            "bill_id": null,
+            "note": null
+          }
+        }
+      ],
+      "final_confirmations": [],
+      "tools_executed": [],
+      "db_entries": [],
+      "cash_ledger": [],
+      "state": {
+        "intent": "accounting"
+      },
+      "bot_reply": null,
+      "aborted": "missing_argument: record_sale_payment ['customer_name']",
+      "error": null,
+      "time_sec": 10.4
+    },
+    {
+      "test_id": "RPT-D-02",
+      "category": "D",
+      "lang": "hinglish",
+      "statement": "Ram ka aaj ka 600 banta tha, de diya",
+      "english": "Ram's 600 for today was due, paid it",
+      "expected_outcome": "ENTRY",
+      "expected": [],
+      "expected_ask": null,
+      "route": "accounting",
+      "questions": [
+        {
+          "type": "role",
+          "person": "Ram",
+          "reason": "KNOWN_PERSON_CONFIRMATION",
+          "interaction": "CONFIRMATION",
+          "options": [
+            {
+              "no": 1,
+              "role": "Employee",
+              "found": true,
+              "confidence": 0.0
+            },
+            {
+              "no": 2,
+              "role": "Customer",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 3,
+              "role": "Supplier",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 4,
+              "role": "Property / Site Owner",
+              "found": false,
+              "confidence": 0.0
+            },
+            {
+              "no": 5,
+              "role": "Family Member",
+              "found": false,
+              "confidence": 2.5
+            }
+          ],
+          "expected_role": "Employee",
+          "answered": "Employee"
+        }
+      ],
+      "final_confirmations": [
+        "Tool: record_employee_transaction\n\nUpdated Arguments:\n{'employee_name': 'Ram', 'transaction_type': <EmployeeTransactionType.PAYMENT: 'payment'>, 'amount': 600.0, 'transaction_date': '2026-10-08', 'payment_method': None, 'payment_provider': None, 'note': None}\n\nExecute this tool? (yes/no)"
+      ],
+      "tools_executed": [
+        {
+          "tool": "record_employee_transaction",
+          "args": {
+            "note": "",
+            "amount": 600.0,
+            "employee_name": "Ram",
+            "payment_method": "",
+            "payment_provider": "",
+            "transaction_date": "2026-10-08",
+            "transaction_type": "payment"
+          },
+          "target_table": "employee_transactions",
+          "target_id": 1,
+          "entry_date": "2026-10-08"
+        }
+      ],
+      "db_entries": [
+        {
+          "id": 1,
+          "employee_id": 1,
+          "transaction_type": "payment",
+          "amount": 600.0,
+          "transaction_date": "2026-10-08",
+          "payment_method": null,
+          "payment_provider": null,
+          "note": "",
+          "status": "active",
+          "_table": "employee_transactions"
+        }
+      ],
+      "cash_ledger": [
+        {
+          "date": "2026-10-08",
+          "direction": "out",
+          "amount": 600.0,
+          "category": "salary",
+          "source": "employee_transactions#1"
+        }
+      ],
+      "state": {
+        "intent": "accounting",
+        "groups": [
+          {
+            "group_id": "G1",
+            "record_type": "Need Person",
+            "identity_key": "Ram",
+            "actions": [
+              "Ram ka aaj ka 600 banta tha, de diya"
+            ]
+          }
+        ],
+        "resolved_roles": {
+          "G1": "Employee"
+        },
+        "tool_arguments": [
+          {
+            "group_id": "G1",
+            "tool": "record_employee_transaction",
+            "args": {
+              "employee_name": "Ram",
+              "transaction_type": "payment",
+              "amount": 600.0,
+              "transaction_date": "2026-10-08",
+              "payment_method": "",
+              "payment_provider": "",
+              "note": "",
+              "unit": "",
+              "reason": "",
+              "movement_type": "",
+              "movement_reason": "",
+              "source_type": "",
+              "destination_type": "",
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      "bot_reply": "✅ Ram ko ₹600.0 payment record ho gayi.\n💰 CashLedger mein ₹600.0 cash OUT bhi record ho gaya.",
+      "aborted": null,
+      "error": null,
+      "time_sec": 10.2
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "sliced_prompt": true,
+  "finished": "2026-10-08T10:59:39.765678"
+}

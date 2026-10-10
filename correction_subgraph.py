@@ -1,7 +1,8 @@
 # correction_subgraph.py
 from datetime import date, datetime, timedelta
 from langgraph.graph import StateGraph, START, END
-from langgraph.types import interrupt
+from langgraph.types import interrupt, Send
+from langchain_core.messages import HumanMessage
 
 from db import SessionLocal
 from models import AuditLog
@@ -34,12 +35,30 @@ from schemas import (
 from state import ChatState
 from correction_format import to_view, render_table, TITLES
 from llm_setup import TOOLS_MAP
-from helpers import insert_audit_log
+from helpers import insert_audit_log, mark_business_tables_corrected, reverse_entry
+from extract_node import extract_node
+from grouping_node import grouping_node
+from person_role_classification_node import person_role_classification_node
+from person_role_hitl_node import person_role_hitl_node
+from tool_decision_node import tool_decision_node
+from tool_argument_extraction_node import tool_argument_extraction_node
+from tool_argument_hitl import _find_missing_arguments, tool_argument_hitl_node
+from tool_argument_update import tool_argument_update_node
+from final_confirmation_node import final_confirmation_node
+from tool_execution_node import tool_execution_node
+from material_movement_subgraph import material_movement_subgraph
+from standalone_transaction_node import standalone_transaction_node
 
 _date_llm = llm.with_structured_output(CorrectionDateResult)
 _detail_llm = llm.with_structured_output(CorrectionDetailResult)
 
 MAX_LIST = 15
+
+import re as _re
+_OPENING_WORDS = _re.compile(
+    r"opening|purana baaki|purane baaki|pichla baaki|pichli baaki|pehle ka baaki|shuru ka cash|"
+    r"shuru mein .*cash|purana udhaar|pehle ka udhaar"
+)
 
 CATEGORY_OPTIONS = [
     CorrectionCategoryOption(option_id=1, category="employee", label="Employee (kaam / payment / attendance)"),
@@ -48,6 +67,8 @@ CATEGORY_OPTIONS = [
     CorrectionCategoryOption(option_id=4, category="purchase", label="Purchase (ghar / property deal)"),
     CorrectionCategoryOption(option_id=5, category="expense", label="Expense (kharcha)"),
     CorrectionCategoryOption(option_id=6, category="material_movement", label="Material Movement (maal / work log / stock)"),
+    CorrectionCategoryOption(option_id=7, category="opening", label="Opening Balance (purana baaki / shuru ka cash)"),
+    CorrectionCategoryOption(option_id=8, category="family", label="Family Kharcha (ghar ke log)"),
 ]
 
 RANGE_OPTIONS = [
@@ -63,6 +84,7 @@ You extract a date from ONE correction sentence in a Hinglish accounting app.
 Today's date: {today}
 
 Return a date ONLY if the text explicitly states a date or a relative date:
+- "aaj", "aj", "today" -> today's own date (same as {today})
 - "kal" -> one day before today, "parso" -> two days before today
 - "2 din pehle", "teen din pehle" -> N days before today
 - "3 tareekh", "9 August", "2026-09-20", "20/09/2026"
@@ -179,6 +201,8 @@ def _search_audit(category: str, date_from: str, date_to: str, name: str | None 
             AuditLog.entry_date >= date.fromisoformat(date_from),
             AuditLog.entry_date <= date.fromisoformat(date_to),
             ~AuditLog.tool_name.startswith("manage_", autoescape=True),
+            # [REVERSAL] rows galat entry ka "ulta" hain — inhe dobara correct karne ka sawaal nahi
+            ~AuditLog.action_statement.startswith("[REVERSAL]", autoescape=True),
         )
         if name:
             q = q.filter(AuditLog.person_name.ilike(f"%{name}%"))
@@ -202,9 +226,25 @@ async def correction_date_extract_node(state):
         return {"correction_data": {"skip": True}}
 
     text = group.actions[0].text
-    found = await _parse_date(text)
     key = (group.identity_key or "").strip()
     name = None if key.lower() == "correction" or not key else key
+
+    # Opening balance ki correction: user ko us entry ki date pata nahi hoti
+    # (wo pehli entry ki date pe lagta hai) — isliye date/category mat poochho,
+    # seedha saari opening entries mein dhoondho.
+    if _OPENING_WORDS.search(text.lower()):
+        today = date.today().isoformat()
+        return {
+            "correction_data": {
+                "group_id": group.group_id, "text": text, "name": name,
+                "date": today, "cancelled": False, "attempts": 0,
+                "category": "opening", "matches": [], "selected_ids": [],
+                "report_shown": False, "name_dropped": False, "range_days": None,
+                "date_from": "2000-01-01", "date_to": today,
+            }
+        }
+
+    found = await _parse_date(text)
     return {
         "correction_data": {
             "group_id": group.group_id,
@@ -229,6 +269,8 @@ def _after_date(state) -> str:
     data = state["correction_data"]
     if data.get("skip") or data.get("cancelled"):
         return "end"
+    if data.get("category"):          # opening balance — category pehle se tay
+        return "search"
     if data.get("date"):
         return "category"
     return "ask"
@@ -497,10 +539,10 @@ async def correction_execute_delete_node(state):
     data = dict(state["correction_data"])
     m = next(x for x in data["matches"] if x["id"] == data["selected_id"])
 
-    tool = TOOLS_MAP.get(m["tool_name"])
     negated_args = _negate_arguments(m["arguments"])
 
-    execution_result = tool.invoke(negated_args)
+    execution_result = reverse_entry(m["tool_name"], m.get("target_table"), m.get("target_id"),
+                                     negated_args, TOOLS_MAP)
 
     db = SessionLocal()
     try:
@@ -520,6 +562,15 @@ async def correction_execute_delete_node(state):
             original = db.query(AuditLog).filter(AuditLog.id == m["id"]).first()
             if original:
                 original.status = "corrected"
+
+            if original is not None and original.target_table and original.target_id:
+                mark_business_tables_corrected(
+                    db=db,
+                    target_table=original.target_table,
+                    old_row_id=original.target_id,
+                    new_row_id=execution_result["target_id"],
+                )
+
             db.commit()
             data["delete_done"] = True
         else:
@@ -556,6 +607,194 @@ async def correction_statement_ask_node(state):
     data["new_statement"] = answer
     return {"correction_data": data}
 
+# ---------------- Naya Statement: internal re-run pipeline ----------------
+
+async def correction_statement_prepare_node(state):
+    """
+    Naya statement ko khud extract+grouping se guzarta hai (jaisa decide
+    kiya tha) — poori accounting_subgraph dobara call nahi karte, sirf
+    non-interrupt nodes (extract, grouping, person-role classification)
+    seedha function-call se.
+
+    - Agar result mein se koi CORRECTION-type group nikle, use silently
+      drop kar dete hain (infinite correction-loop se bachne ke liye).
+    - Agar kisi action mein explicit date nahi mili, purani (galat) entry
+      ki date use karte hain — "aaj" ka default nahi, kyunki yahan date
+      ka matlab hai "jis din purani entry hui thi", na ki "aaj".
+    """
+    data = dict(state["correction_data"])
+    new_statement = data["new_statement"]
+
+    extracted = await extract_node({"messages": [HumanMessage(content=new_statement)]})
+    grouped = await grouping_node({"extracted_intent": extracted["extracted_intent"]})
+    grouped_intent = grouped["grouped_intent"]
+
+    kept_groups = [g for g in grouped_intent.groups if g.record_type != RecordType.CORRECTION]
+
+    if not kept_groups:
+        data["statement_dropped"] = True
+        return {"correction_data": data}
+
+    m = next(x for x in data["matches"] if x["id"] == data["selected_id"])
+    original_date = m["entry_date"]
+
+    for group in kept_groups:
+        for action in group.actions:
+            explicit_date = await _parse_date(action.text)
+            if not explicit_date:
+                action.date = original_date
+
+    grouped_intent.groups = kept_groups
+
+    person_role_rankings = []
+    if any(g.record_type == RecordType.NEED_PERSON for g in kept_groups):
+        ranked = await person_role_classification_node({"grouped_intent": grouped_intent})
+        person_role_rankings = ranked["person_role_rankings"]
+
+    return {
+        "correction_data": data,
+        "grouped_intent": grouped_intent,
+        "person_role_rankings": person_role_rankings,
+    }
+
+
+def _statement_dispatch(state):
+    """
+    Naya-statement ke groups ko (Correction-type already-filtered) unke
+    apne branch mein bhejta hai — accounting_subgraph ke group_dispatcher
+    jaisa hi pattern, isi subgraph ke andar.
+    """
+    data = state["correction_data"]
+    if data.get("statement_dropped"):
+        return "placeholder"
+
+    groups = state["grouped_intent"].groups
+    rankings_by_group = {r.group_id: r for r in (state.get("person_role_rankings") or [])}
+    sends = []
+    for group in groups:
+        if group.record_type == RecordType.NEED_PERSON:
+            ranking = rankings_by_group.get(group.group_id)
+            if ranking is None:
+                raise ValueError(f"No person-role ranking found for {group.group_id}.")
+            sends.append(Send("statement_person_hitl", {
+                "single_group": group,
+                "person_role_rankings": [ranking],
+            }))
+        elif group.record_type == RecordType.MATERIAL_MOVEMENT:
+            sends.append(Send("statement_material_movement", {"single_group": group}))
+        elif group.record_type == RecordType.STANDALONE_TRANSACTION:
+            sends.append(Send("statement_standalone", {"single_group": group}))
+    return sends
+
+
+def _after_statement_tool_argument_extraction(state) -> str:
+    tool_argument_results = state.get("tool_argument_results")
+    if tool_argument_results is None:
+        raise ValueError("tool_argument_results not found after Naya Statement extraction.")
+    for result in tool_argument_results.results:
+        missing_arguments = _find_missing_arguments(
+            tool_name=result.tool_name,
+            arguments=result.arguments,
+        )
+        if missing_arguments:
+            return "tool_argument_hitl"
+    return "final_confirm"
+
+
+async def correction_statement_execute_node(state):
+    """
+    Final-confirmation ke baad: pehle naya statement execute karo, SIRF
+    uske successful hone par purani (galat) entry ko reverse+corrected
+    karo. Beech mein kahin bhi "no" aaya ho to yahan tak pahunchenge hi
+    nahi — purani entry bilkul untouched rehti hai.
+    """
+    data = dict(state["correction_data"])
+
+    confirmations = state.get("final_confirmation_results") or []
+    all_yes = bool(confirmations) and all(
+        str(c["confirmed"]).strip().lower() == "yes" for c in confirmations
+    )
+
+    if not all_yes:
+        data["statement_cancelled"] = True
+        # Outer accounting_subgraph ka TOOL_EXECUTION "correction" ke
+        # turant baad chalta hai — agar yahan tool_argument_results
+        # chhod diya, to woh dobara (ya partially) execute kar dega.
+        # Isliye yahin clear kar dete hain: ab kuch bhi execute nahi hona.
+        return {"correction_data": data, "tool_argument_results": None}
+
+    exec_state = dict(state)
+    exec_state["original_user_statement"] = data["new_statement"]
+    exec_result = await tool_execution_node(exec_state)
+    execution_results = exec_result.get("tool_execution_results", [])
+
+    failed = (not execution_results) or any(
+        isinstance(r, str) and r.startswith("❌") for r in execution_results
+    )
+
+    if failed:
+        data["statement_execution_failed"] = True
+        return {
+            "correction_data": data,
+            "tool_execution_results": execution_results,
+            "tool_argument_results": None,
+        }
+
+    # Naya statement successfully execute ho gaya — ab purani entry
+    # reverse+corrected karo (Delete-case jaisa hi tareeka).
+    m = next(x for x in data["matches"] if x["id"] == data["selected_id"])
+    negated_args = _negate_arguments(m["arguments"])
+    reversal_result = reverse_entry(m["tool_name"], m.get("target_table"), m.get("target_id"),
+                                    negated_args, TOOLS_MAP)
+
+    db = SessionLocal()
+    try:
+        if isinstance(reversal_result, dict):
+            insert_audit_log(
+                db=db,
+                full_statement=data["text"],
+                action_statement=f"[REVERSAL] {m['action_statement']}",
+                tool_name=m["tool_name"],
+                arguments=negated_args,
+                target_table=reversal_result["target_table"],
+                target_id=reversal_result["target_id"],
+                group_id=m["group_id"],
+                action_index=m["action_index"],
+                run_id=m["run_id"],
+            )
+            original = db.query(AuditLog).filter(AuditLog.id == m["id"]).first()
+            if original:
+                original.status = "corrected"
+
+            if original is not None and original.target_table and original.target_id:
+                mark_business_tables_corrected(
+                    db=db,
+                    target_table=original.target_table,
+                    old_row_id=original.target_id,
+                    new_row_id=reversal_result["target_id"],
+                )
+
+            db.commit()
+            data["statement_done"] = True
+        else:
+            data["statement_reversal_error"] = str(reversal_result)
+    finally:
+        db.close()
+
+    # Already (ourselves) execute kar chuke — outer TOOL_EXECUTION node
+    # ko dobara chalne se rokne ke liye yahan clear karna zaroori hai,
+    # warna wahi tool-call ek baar aur execute ho jayega (duplicate TX).
+    return {
+        "correction_data": data,
+        "tool_execution_results": execution_results,
+        "tool_argument_results": None,
+    }
+
+
+def _after_statement_ask(state) -> str:
+    return "placeholder" if state["correction_data"].get("cancelled") else "prepare"
+
+
 # ---------------- Placeholder (confirm/edit/delete aane tak) ----------------
 
 async def correction_placeholder_node(state):
@@ -587,8 +826,18 @@ async def correction_placeholder_node(state):
             elif data.get("delete_error"):
                 print("Delete FAIL hua:", data["delete_error"])
         else:
-            print("Action: NAYA STATEMENT (abhi implement nahi hui — agla step)")
+            print("Action: NAYA STATEMENT")
             print("Naya statement:", data.get("new_statement"))
+            if data.get("statement_dropped"):
+                print("Naya statement khud ek Correction tha — drop kar diya gaya (infinite loop se bachne ke liye).")
+            elif data.get("statement_cancelled"):
+                print("Naya statement process cancel ho gaya. Purani entry untouched hai.")
+            elif data.get("statement_execution_failed"):
+                print("Naya statement execute nahi ho paya. Purani entry untouched hai.")
+            elif data.get("statement_reversal_error"):
+                print("Naya statement execute ho gaya, par purani entry reverse karte waqt error:", data["statement_reversal_error"])
+            elif data.get("statement_done"):
+                print("Naya statement successfully execute ho gaya, aur purani entry reverse+corrected ho gayi.")
     elif data.get("selected_id"):
         m = next(x for x in data["matches"] if x["id"] == data["selected_id"])
         print("Category:", data["category"])
@@ -614,15 +863,25 @@ _subgraph.add_node("confirm_ask", correction_confirm_ask_node)
 _subgraph.add_node("action_ask", correction_action_ask_node)
 _subgraph.add_node("statement_ask", correction_statement_ask_node)
 _subgraph.add_node("execute_delete", correction_execute_delete_node)
+_subgraph.add_node("statement_prepare", correction_statement_prepare_node)
+_subgraph.add_node("statement_person_hitl", person_role_hitl_node)
+_subgraph.add_node("statement_material_movement", material_movement_subgraph)
+_subgraph.add_node("statement_standalone", standalone_transaction_node)
+_subgraph.add_node("statement_tool_decision", tool_decision_node, defer=True)
+_subgraph.add_node("statement_tool_argument_extraction", tool_argument_extraction_node)
+_subgraph.add_node("statement_tool_argument_hitl", tool_argument_hitl_node)
+_subgraph.add_node("statement_tool_argument_update", tool_argument_update_node)
+_subgraph.add_node("statement_final_confirm", final_confirmation_node)
+_subgraph.add_node("statement_execute", correction_statement_execute_node)
 
 _subgraph.add_edge(START, "date_extract")
 _subgraph.add_conditional_edges(
     "date_extract", _after_date,
-    {"ask": "date_ask", "category": "category_ask", "end": "placeholder"},
+    {"ask": "date_ask", "category": "category_ask", "search": "search", "end": "placeholder"},
 )
 _subgraph.add_conditional_edges(
     "date_ask", _after_date,
-    {"ask": "date_ask", "category": "category_ask", "end": "placeholder"},
+    {"ask": "date_ask", "category": "category_ask", "search": "search", "end": "placeholder"},
 )
 _subgraph.add_conditional_edges(
     "category_ask", _after_category,
@@ -650,7 +909,23 @@ _subgraph.add_conditional_edges(
     {"execute_delete": "execute_delete", "statement": "statement_ask", "end": "placeholder"},
 )
 _subgraph.add_edge("execute_delete", "placeholder")
-_subgraph.add_edge("statement_ask", "placeholder")
+_subgraph.add_conditional_edges(
+    "statement_ask", _after_statement_ask,
+    {"placeholder": "placeholder", "prepare": "statement_prepare"},
+)
+_subgraph.add_conditional_edges("statement_prepare", _statement_dispatch)
+_subgraph.add_edge("statement_person_hitl", "statement_tool_decision")
+_subgraph.add_edge("statement_material_movement", "statement_tool_decision")
+_subgraph.add_edge("statement_standalone", "statement_tool_decision")
+_subgraph.add_edge("statement_tool_decision", "statement_tool_argument_extraction")
+_subgraph.add_conditional_edges(
+    "statement_tool_argument_extraction", _after_statement_tool_argument_extraction,
+    {"tool_argument_hitl": "statement_tool_argument_hitl", "final_confirm": "statement_final_confirm"},
+)
+_subgraph.add_edge("statement_tool_argument_hitl", "statement_tool_argument_update")
+_subgraph.add_edge("statement_tool_argument_update", "statement_final_confirm")
+_subgraph.add_edge("statement_final_confirm", "statement_execute")
+_subgraph.add_edge("statement_execute", "placeholder")
 _subgraph.add_edge("placeholder", END)
 
 # Bina apne checkpointer ke compile: parent ka checkpointer inherit hota hai.

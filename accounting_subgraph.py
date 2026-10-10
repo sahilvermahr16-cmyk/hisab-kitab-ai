@@ -5,7 +5,7 @@ from extract_node import extract_node
 from schemas import RecordType
 from state import ChatState
 
-from grouping_node import grouping_node
+from grouping_node import grouping_node, unresolved_reference
 from person_role_classification_node import person_role_classification_node
 from tool_decision_node import tool_decision_node
 from tool_argument_extraction_node import tool_argument_extraction_node
@@ -21,6 +21,7 @@ from material_movement_subgraph import material_movement_subgraph
 from standalone_transaction_node import standalone_transaction_node
 from correction_node import correction_node
 from correction_subgraph import correction_subgraph
+from accounting_reply_node import accounting_reply_node
 
 
 def group_dispatcher(state):
@@ -39,11 +40,15 @@ def group_dispatcher(state):
     rankings_by_group = {
         r.group_id: r for r in (state.get("person_role_rankings") or [])
     }
-
     sends = []
     for group in groups:
         if group.record_type == RecordType.CORRECTION:
             continue   # correction FINAL_CONFIRMATION ke baad chalega
+        if unresolved_reference(group):
+            # "unko"/"bhatte" — naam nahi, role ka sawaal bekaar; seedha aage (entry nahi banegi)
+            print(f"🚫 DISPATCH: {group.group_id} ka naam '{group.identity_key}' sirf ishara hai — role nahi poochhenge")
+            sends.append(Send("standalone_transaction", {"single_group": group}))
+            continue
         if group.record_type == RecordType.NEED_PERSON:
             ranking = rankings_by_group.get(group.group_id)
             if ranking is None:
@@ -53,7 +58,9 @@ def group_dispatcher(state):
                 "person_role_rankings": [ranking],
             }))
         elif group.record_type == RecordType.MATERIAL_MOVEMENT:
-            sends.append(Send("material_movement", {"single_group": group}))
+            # poora statement bhi — "Sohan aaj gudam pe tha, … dukaan pahunchayi" mein source doosre group mein hai
+            sends.append(Send("material_movement", {"single_group": group,
+                                                    "original_user_statement": state.get("original_user_statement")}))
         elif group.record_type == RecordType.STANDALONE_TRANSACTION:
             sends.append(Send("standalone_transaction", {"single_group": group}))
         else:
@@ -107,6 +114,7 @@ accounting_subgraph.add_node(TOOL_ARGUMENT_HITL, tool_argument_hitl_node)
 accounting_subgraph.add_node(FINAL_CONFIRMATION, final_confirmation_node)
 accounting_subgraph.add_node("correction", correction_subgraph)
 accounting_subgraph.add_node(TOOL_EXECUTION, tool_execution_node)
+accounting_subgraph.add_node("reply", accounting_reply_node)
 
 accounting_subgraph.add_edge(START, "extract")
 accounting_subgraph.add_edge("extract", "grouping")
@@ -138,7 +146,8 @@ accounting_subgraph.add_edge(TOOL_ARGUMENT_HITL, TOOL_ARGUMENT_UPDATE)
 accounting_subgraph.add_edge(TOOL_ARGUMENT_UPDATE, FINAL_CONFIRMATION)
 accounting_subgraph.add_edge(FINAL_CONFIRMATION, "correction")
 accounting_subgraph.add_edge("correction", TOOL_EXECUTION)
-accounting_subgraph.add_edge(TOOL_EXECUTION, END)
+accounting_subgraph.add_edge(TOOL_EXECUTION, "reply")
+accounting_subgraph.add_edge("reply", END)
 
 
 

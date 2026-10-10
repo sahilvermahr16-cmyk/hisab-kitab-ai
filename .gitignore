@@ -18,6 +18,8 @@ __pycache__/
 # Test data & outputs
 *.xlsx
 testing_output/
+reports_output/
+test/results/**/*.log
 
 # Scratch notebooks / debug
 g.ipynb
@@ -28,3 +30,29 @@ debug_test.py
 .idea/
 .DS_Store
 Thumbs.db
+
+# Companion workbook of the technical report (other Excel files stay ignored)
+!test/report/Hisab-Kitab_Testing_Report_v2.xlsx
+
+# Test run files: keep only the runs cited in the technical report (Appendix C)
+test/results/**/*.json
+!test/results/emp/emp_hinglish_2026-10-05_1349.json
+!test/results/cust/cust_hinglish_2026-10-05_1757.json
+!test/results/cust/cust_hinglish_2026-10-05_2214.json
+!test/results/supp/supp_hinglish_2026-10-06_0035.json
+!test/results/supp/supp_hinglish_2026-10-06_1527.json
+!test/results/exp/exp_hinglish_2026-10-06_1646.json
+!test/results/exp/exp_hinglish_2026-10-06_1742.json
+!test/results/fam/fam_hinglish_2026-10-06_1823.json
+!test/results/fam/fam_hinglish_2026-10-07_1215.json
+!test/results/stk/stk_hinglish_2026-10-08_0619.json
+!test/results/stk/stk_hinglish_2026-10-08_0707.json
+!test/results/pur/pur_hinglish_2026-10-08_0800.json
+!test/results/pur/pur_hinglish_2026-10-08_1317.json
+!test/results/rpt/rpt_hinglish_2026-10-08_1058.json
+!test/results/rpt/rpt_hinglish_2026-10-08_1116.json
+!test/results/cor/cor_hinglish_2026-10-08_1128.json
+!test/results/cor/cor_hinglish_2026-10-08_1157.json
+!test/results/rtr/rtr_hinglish_2026-10-08_1227.json
+!test/results/fin/fin_hinglish_2026-10-08_1440.json
+!test/results/fin2/fin2_hinglish_2026-10-08_1651.json

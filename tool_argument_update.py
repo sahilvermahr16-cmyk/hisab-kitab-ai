@@ -1,3 +1,4 @@
+from number_words import normalize_numbers
 # tool_argument_update_node.py
 
 from langchain_core.prompts import ChatPromptTemplate
@@ -526,7 +527,7 @@ async def tool_argument_update_node(state):
             original_user_statement=state["original_user_statement"],
             arguments=result.arguments,
             missing_arguments=update["missing_arguments"],
-            updated_statement=update["updated_statement"],
+            updated_statement=normalize_numbers(update["updated_statement"]),
         )
 
         structured_llm = llm.with_structured_output(

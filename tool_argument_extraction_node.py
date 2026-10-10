@@ -2,8 +2,26 @@
 from datetime import date
 from langchain_core.prompts import ChatPromptTemplate
 from helpers import _link_direct_sale_tools
-from tool_argument_models import TOOL_ARGUMENT_MODELS
-from schemas import ToolArgumentResult, ToolName, ToolArgumentExtractionResult, TransactionType
+from tool_argument_models import TOOL_ARGUMENT_MODELS, OpeningPartyType, OpeningDirection, InventoryUnit, ExpenseCategory
+from schemas import ToolArgumentResult, ToolName, ToolArgumentExtractionResult, TransactionType, PersonRole, RecordType
+from helpers import NAME_FIELD_MODELS, resolve_person_name
+from attendance_rules import fix_attendance_args
+from note_rules import clean_note
+from rate_rules import fix_rate_amount, fix_return_sign, strip_descriptor, split_descriptor, fix_per_bulk_rate, \
+    fix_per_unit_rate, fix_ton_kg
+from attendance_rules import strip_non_money
+import re as _re_pay
+from sale_rules import goods_word, ITEM_ADJECTIVES
+_OWE_US = _re_pay.compile(
+    r"\b(humare|hamare|hamaare|mere|apne)\s+upar\b|\b(hume|humein|hamein|humko)\s+(dene|dena)\b|\bdene\s+(hain|hai|baaki)\b"
+    r"|\bdena\s+(hai|baaki)\b|\bwe\s+owe\b|हमारे\s+ऊपर|हमें\s+देने|देने\s+हैं", _re_pay.IGNORECASE)
+_OWE_THEM = _re_pay.compile(
+    r"\b(unke|uske|inke|iske)\s+upar\b|\b(unpe|uspe|unpar|uspar)\s+baaki\b|\blene\s+(hain|hai|baaki)\b"
+    r"|\blena\s+(hai|baaki)\b|\b(unse|usse)\s+lene\b|\bowes\s+us\b|उनके\s+ऊपर|लेने\s+हैं", _re_pay.IGNORECASE)
+_SEEDHA = _re_pay.compile(r"\b(seedha|seedhi|seedhe|sidha|sidhi|sidhe|direct|directly)\b|सीधा|सीधी|सीधे", _re_pay.IGNORECASE)
+_PAID_WORDS = _re_pay.compile(
+    r"\b(diye|diya|de diye|de diya|de di|bheje|bheja|pakdaye|thama diye|paid|gave|sent)\b|दिए|दिया|दे दिए|भेजे",
+    _re_pay.IGNORECASE)
 from llm_setup import llm
 from pydantic import BaseModel
 from schema_formatter import format_schema
@@ -55,6 +73,32 @@ Whenever the selected schema contains a date field:
   - this year
 If the user does not mention a date, use {today}.
 Never invent dates.
+
+═══════════════════════════════
+GLOBAL NOTE RULE
+═══════════════════════════════
+Whenever the selected schema contains a note field:
+
+note = short, useful extra information from THIS action that has
+no dedicated field — purpose, reason, work description, counts,
+place, remark.
+
+• Keep the user's own words and script. Do not translate.
+• Take note ONLY from the current action text — never from
+  another part of the message, another person or another tool.
+• NEVER put into note anything that already has its own field:
+  person names, amount, dates or day words (aaj, kal, "on
+  2026-..."), payment method / provider (cash, nakad, UPI,
+  PhonePe, Google Pay, bank, khaata), phone, address, role.
+• NEVER put meaningless fragments into note: "ke saath",
+  "wahan", "kiya", "diye", "hua", "aur", "to him".
+• If nothing extra remains → note=null. Never fill note just
+  to fill it.
+
+"Bhiyalal ko 250 thama diye" → note=null
+"Bhiyalal ko school ki fees ke liye 250 thama diye" → note="school ki fees ke liye"
+"राम को बच्चों की फीस के लिए 500 दिए" → note="बच्चों की फीस के लिए"
+"Paid Ram 500 for his bike repair" → note="for his bike repair"
 
 ═══════════════════════════════
 EMPLOYEE RULES
@@ -225,6 +269,31 @@ role="driver"
 note="HasiGate site pr kaam karega"
 
 ───────────────────────────────
+
+User:
+"विनोद नया ड्राइवर है, नंबर 9729000011, बापोड़ा गांव का है"
+
+Extract:
+employee_name="विनोद"
+role="ड्राइवर"
+phone="9729000011"
+address="बापोड़ा गांव"
+note=null
+
+───────────────────────────────
+
+User:
+"New helper Mahesh joined, phone 9416000022, lives near the
+bus stand, will start from Monday"
+
+Extract:
+employee_name="Mahesh"
+role="helper"
+phone="9416000022"
+address="near the bus stand"
+note="will start from Monday"
+
+───────────────────────────────
 PROFILE VS ACTUAL WORK
 ───────────────────────────────
 
@@ -379,6 +448,99 @@ amount=500
 note=null
 
 ───────────────────────────────
+PAYMENT METHOD / PROVIDER
+───────────────────────────────
+
+Fill payment_method ONLY when the user says how the money went:
+
+cash          ← cash, nakad, naqad, haath mein, नकद, कैश, in cash
+upi           ← UPI, PhonePe, Google Pay, GPay, Paytm, BHIM,
+                फोनपे, गूगल पे, पेटीएम
+bank_transfer ← khaate mein, account mein, bank se, NEFT, IMPS,
+                खाते में, बैंक से, into his account
+cheque        ← cheque, चेक
+
+payment_provider = the app or bank name if said:
+google_pay, phonepe, paytm, bhim, sbi, hdfc, icici, pnb, axis
+
+Not mentioned → payment_method=null, payment_provider=null.
+Method and provider words never go into note.
+
+───────────────────────────────
+MORE EXAMPLES (all languages)
+───────────────────────────────
+
+User:
+"Vinod ko Paytm se 450 bheje, bijli ka bill bharne ke liye"
+
+Extract:
+employee_name="Vinod"
+transaction_type="payment"
+amount=450
+payment_method="upi"
+payment_provider="paytm"
+note="bijli ka bill bharne ke liye"
+
+───────────────────────────────
+
+User:
+"महेश को 700 रुपये कैश में पकड़ा दिए"
+
+Extract:
+employee_name="महेश"
+transaction_type="payment"
+amount=700
+payment_method="cash"
+payment_provider=null
+note=null
+
+───────────────────────────────
+
+User:
+"Transferred 2000 to Mahesh's HDFC account for his rent"
+
+Extract:
+employee_name="Mahesh"
+transaction_type="payment"
+amount=2000
+payment_method="bank_transfer"
+payment_provider="hdfc"
+note="for his rent"
+
+───────────────────────────────
+
+User:
+"महेश ने छत पर 20 तसले मसाला चढ़ाया, 500 का काम"
+
+Extract:
+employee_name="महेश"
+transaction_type="work"
+amount=500
+note="छत पर 20 तसले मसाला चढ़ाया"
+
+───────────────────────────────
+
+User:
+"Vinod cleaned the shop and stacked the doors, 350 for the work"
+
+Extract:
+employee_name="Vinod"
+transaction_type="work"
+amount=350
+note="cleaned the shop and stacked the doors"
+
+───────────────────────────────
+
+User:
+"Vinod ne udhar bhi 375 ka kaam kar diya"
+
+Extract:
+employee_name="Vinod"
+transaction_type="work"
+amount=375
+note=null        ← NOT "udhar kaam kar diya" (no real information)
+
+───────────────────────────────
 EMPLOYEE ACCOUNT QUERY
 ───────────────────────────────
 
@@ -497,6 +659,16 @@ driving="P"
 attendance="half"
 driving="half"
 
+Driving is filled ONLY when a vehicle/trip word is present
+(driving, gaadi, tractor, dumper, truck, trip, chakkar, pheri,
+drove). Otherwise driving="absent" — never put a half/full day
+into driving just because "aadha" or "poora" appears.
+
+"din bhar tractor ke chakkar lagaye" / "drove the tractor all day" → attendance="P", driving="P"
+"dopahar ko nikal gaya" / "left at lunch" / "दोपहर में निकल गया"
+  → attendance="half", driving="absent"
+"duty par raha" / "subah se raat tak yahin raha" → attendance="P", driving="absent"
+
 ───────────────────────────────
 ATTENDANCE + DRIVING
 ───────────────────────────────
@@ -567,6 +739,55 @@ employee_name="Ram"
 attendance="P"
 driving="half"
 attendance_date="{today}"
+
+───────────────────────────────
+ATTENDANCE NOTE
+───────────────────────────────
+
+Reason, task or trip details go into note (user's words).
+Plain presence/absence → note=null.
+
+User:
+"Vinod aaj nahi aaya, bachche ki tabiyat theek nahi thi"
+
+Extract:
+employee_name="Vinod"
+attendance="absent"
+driving="absent"
+note="bachche ki tabiyat theek nahi thi"
+
+───────────────────────────────
+
+User:
+"महेश आज पूरा दिन आया"
+
+Extract:
+employee_name="महेश"
+attendance="P"
+driving="absent"
+note=null
+
+───────────────────────────────
+
+User:
+"Mahesh drove the dumper for half a day, 3 trips of sand"
+
+Extract:
+employee_name="Mahesh"
+attendance="half"
+driving="half"
+note="3 trips of sand"
+
+───────────────────────────────
+
+User:
+"Deepak worked half day today, he had to go to the bank"
+
+Extract:
+employee_name="Deepak"
+attendance="half"
+driving="absent"
+note="had to go to the bank"
 
 ═══════════════════════════════
 MANAGE CUSTOMER
@@ -3040,6 +3261,84 @@ the total deal value.
 
 """
 
+
+
+# ═══════════════════════════════════════════════════════════════
+# PROMPT KO BUNDLE KE HISAAB SE BAANTNA  (switch: .env SLICED_PROMPT=1)
+#
+# Poora PROMPT ~14k tokens ka hai aur pehle HAR tool call pe poora jaata tha.
+# Ab (switch chalu hone par) sirf: common hissa (ROLE / OBJECTIVE / DATE)
+# + is group ke bundle ke tools ke section — jaise Tool Decision karta hai.
+# Niyam ka ek bhi shabd nahi badla; sirf bhejne ka tareeka.
+# Bundle na mile (jaise correction flow) → purana poora PROMPT.
+# ═══════════════════════════════════════════════════════════════
+import os as _os
+import re as _re_sl
+
+# section header → kaunse tools ke kaam ka
+_SECTION_TOOLS = {
+    "EMPLOYEE RULES": {ToolName.MANAGE_EMPLOYEE, ToolName.RECORD_EMPLOYEE_TRANSACTION},
+    "ATTENDANCE RULES": {ToolName.RECORD_ATTENDANCE},
+    "MANAGE CUSTOMER": {ToolName.MANAGE_CUSTOMER},
+    "RECORD_SALE_TRANSACTION": {ToolName.RECORD_SALE_TRANSACTION},
+    "RECORD_SALE_PAYMENT": {ToolName.RECORD_SALE_PAYMENT},
+    "MANAGE_SUPPLIER": {ToolName.MANAGE_SUPPLIER},
+    "RECORD_SUPPLIER_TRANSACTION": {ToolName.RECORD_SUPPLIER_TRANSACTION},
+    "RECORD_SUPPLIER_PAYMENT": {ToolName.RECORD_SUPPLIER_PAYMENT},
+    "RECORD_MATERIAL_MOVEMENT": {ToolName.RECORD_MATERIAL_MOVEMENT},
+    "RECORD_WORK_LOG": {ToolName.RECORD_WORK_LOG},
+    "RECORD_ADJUSTMENT": {ToolName.RECORD_ADJUSTMENT},
+    "RECORD_EXPENSE": {ToolName.RECORD_EXPENSE},
+    "RECORD_EXPENSE_PAYMENT": {ToolName.RECORD_EXPENSE_PAYMENT},
+    "RECORD_PURCHASE": {ToolName.RECORD_PURCHASE},
+    "RECORD_PURCHASE_PAYMENT": {ToolName.RECORD_PURCHASE_PAYMENT},
+}
+
+
+def _split_prompt(text: str):
+    """PROMPT → (common hissa, [(header, section_text), ...]) — top-level headers pe kaat ke."""
+    lines = text.split("\n")
+    bar = _re_sl.compile(r"^═{10,}\s*$")
+    cuts = []
+    for i in range(len(lines) - 2):
+        if bar.match(lines[i]) and bar.match(lines[i + 2]) and lines[i + 1].strip() in _SECTION_TOOLS:
+            cuts.append((i, lines[i + 1].strip()))
+    common = "\n".join(lines[: cuts[0][0]])
+    sections = []
+    for k, (start, header) in enumerate(cuts):
+        end = cuts[k + 1][0] if k + 1 < len(cuts) else len(lines)
+        sections.append((header, "\n".join(lines[start:end])))
+    return common, sections
+
+
+PROMPT_COMMON, PROMPT_SECTIONS = _split_prompt(PROMPT)
+
+
+def sliced_prompt(tools) -> str:
+    """Common hissa + sirf in tools ke sections (purane kram mein)."""
+    tools = set(tools)
+    parts = [PROMPT_COMMON] + [txt for header, txt in PROMPT_SECTIONS if _SECTION_TOOLS[header] & tools]
+    return "\n".join(parts)
+
+
+def sliced_prompt_enabled() -> bool:
+    return _os.getenv("SLICED_PROMPT", "0").strip().lower() in ("1", "true", "yes", "on")
+
+
+def _bundle_for(group, resolved_person_roles, transaction_classifier_results):
+    """Is group ka tool bundle (Tool Decision wala hi). Na mile → None (poora prompt)."""
+    try:
+        from tool_decision_node import resolve_available_tools
+        txn = transaction_classifier_results.get(group.group_id)
+        return list(resolve_available_tools(
+            record_type=group.record_type,
+            person_role=resolved_person_roles.get(group.group_id),
+            transaction_type=txn.transaction_type if txn else None,
+        ))
+    except Exception:
+        return None
+
+
 class ToolArgumentExtractor:
 
     def __init__(self, llm):
@@ -3052,13 +3351,19 @@ class ToolArgumentExtractor:
         schema: type[BaseModel],
         user_message: str,
         current_action: str,
+        bundle_tools=None,
     ):
         from datetime import timedelta
 
         today = date.today()
         yesterday = today - timedelta(days=1)
 
-        system_prompt = PROMPT.format(
+        template = PROMPT
+        if bundle_tools and sliced_prompt_enabled():
+            template = sliced_prompt(set(bundle_tools) | {tool_name})
+            print(f"✂️ ARGUMENT PROMPT: bundle {sorted(t.value for t in set(bundle_tools) | {tool_name})} "
+                  f"— ~{len(template) // 4} tokens (poora ~{len(PROMPT) // 4})")
+        system_prompt = template.format(
             today=today,
             yesterday=yesterday,
             month_start=today.replace(day=1),
@@ -3097,7 +3402,7 @@ class ToolArgumentExtractor:
             current_action=current_action,
         )
 
-    async def invoke(self, *, tool_name: ToolName, user_message: str, current_action: str,):
+    async def invoke(self, *, tool_name: ToolName, user_message: str, current_action: str, bundle_tools=None):
         schema = TOOL_ARGUMENT_MODELS.get(tool_name)
         if schema is None:
             raise ValueError(f"No argument schema registered for tool '{tool_name}'.")
@@ -3107,6 +3412,7 @@ class ToolArgumentExtractor:
             schema=schema,
             user_message=user_message,
             current_action=current_action,
+            bundle_tools=bundle_tools,
         )
 
         structured_llm = self.llm.with_structured_output(schema)
@@ -3116,6 +3422,223 @@ class ToolArgumentExtractor:
         arguments = await chain.ainvoke({})
 
         return arguments
+
+
+_DATE_FIELDS = ("transaction_date", "attendance_date", "sale_date", "payment_date", "purchase_date",
+                "expense_date", "activity_date", "movement_date", "adjustment_date")
+
+
+import re as _re_mod
+_re_due = _re_mod.compile(r"(\d[\d,]*)\s*(?:rupaye\s*|rs\s*)?(?:dene|dena)?\s*(?:baaki|baki|udhaar|udhar)\b", _re_mod.IGNORECASE)
+
+
+def _payment_from_sale(results, action_texts):
+    """
+    Ek hi action mein bikri + payment, aur payment ki rakam khaali ("poore paise mil gaye",
+    "paise mil gaye", "GPay se payment aayi") → payment = bikri ki rakam. Agar text mein
+    bikri ke alawa koi aur rakam hai to andaza nahi — tab sawaal poochha jayega.
+    """
+    import re as _r
+    from attendance_rules import strip_non_money
+    by_action = {}
+    for r in results:
+        by_action.setdefault((r.group_id, r.action_index), []).append(r)
+    for key, rs in by_action.items():
+        sale = next((r for r in rs if r.tool_name == ToolName.RECORD_SALE_TRANSACTION), None)
+        pay = next((r for r in rs if r.tool_name == ToolName.RECORD_SALE_PAYMENT), None)
+        if not sale or not pay or getattr(pay.arguments, "amount", None) not in (None, 0):
+            continue
+        amt = getattr(sale.arguments, "amount", None)
+        if not amt or amt <= 0:
+            continue
+        known = {float(x) for x in (amt, getattr(sale.arguments, "quantity", None),
+                                    getattr(sale.arguments, "rate", None)) if x}
+        nums = {float(x.replace(",", "")) for x in _r.findall(r"\d[\d,]*(?:\.\d+)?",
+                                                              strip_non_money(action_texts.get(key, "")))}
+        if nums <= known:
+            pay.arguments.amount = amt
+            print(f"💵 PAYMENT: '{action_texts.get(key)}' — payment ki rakam = bikri ki rakam {amt:g}")
+
+
+_HALF = _re_pay.compile(r"\b(aadha|adha|aadhe|adhe|aadhi|adhi|half)\b|आधा|आधे|आधी", _re_pay.IGNORECASE)
+_FULL_PAY = _re_pay.compile(
+    r"\b(payment|pement)\s+(kar|kr|ho)\s+(di|diya|dia|gayi|gai)\b|\b(cash|nakad|poore|pure|poora|paise|paisa|full)\b"
+    r"|paid in cash|paid in full|पेमेंट|नकद|कैश|पूरे|पैसे", _re_pay.IGNORECASE)
+
+
+def _payment_from_purchase(results, action_texts):
+    """
+    Supplier payment ki rakam khaali ("payment kar di", "cash diya", "aadha de diya") aur usi message mein
+    usi supplier ki maal/bill entry hai → poori payment = wahi total, "aadha" = total ÷ 2.
+    Text mein koi aur rakam ho, ya supplier ki entry na mile → kuch nahi (system poochhega).
+    """
+    import re as _r
+    from attendance_rules import strip_non_money
+
+    def key(n):
+        return (str(n or "").strip().lower().split() or [""])[0]
+
+    totals = {}
+    for r in results:
+        if r.tool_name == ToolName.RECORD_SUPPLIER_TRANSACTION:
+            amt = getattr(r.arguments, "amount", None)
+            if amt and amt > 0:
+                totals.setdefault(key(getattr(r.arguments, "supplier_name", None)), []).append(amt)
+    for r in results:
+        if r.tool_name != ToolName.RECORD_SUPPLIER_PAYMENT:
+            continue
+        text = action_texts.get((r.group_id, r.action_index), "")
+        cur = getattr(r.arguments, "amount", None)
+        # "aadha de diya" → LLM ne kabhi 0.5 likh diya (hissa, rakam nahi) → woh bhi khaali maano
+        if cur not in (None, 0) and not (0 < cur < 1 and _HALF.search(text)):
+            continue
+        if _r.search(r"\d", strip_non_money(text)):
+            continue                                   # apni rakam likhi hai — andaza nahi
+        found = totals.get(key(getattr(r.arguments, "supplier_name", None))) or []
+        if len(found) != 1:
+            continue
+        total = found[0]
+        if _HALF.search(text):
+            r.arguments.amount = round(total / 2, 2)
+            print(f"💵 PAYMENT: '{text}' — aadha: {total:g} ÷ 2 = {total / 2:g}")
+        elif _FULL_PAY.search(text):
+            r.arguments.amount = total
+            print(f"💵 PAYMENT: '{text}' — poori payment = maal/bill ki rakam {total:g}")
+
+
+import re as _re_drv
+
+
+def _employee_names():
+    try:
+        from db import SessionLocal
+        from models import Employee
+        db = SessionLocal()
+        try:
+            return [n for (n,) in db.query(Employee.name).all() if n]
+        finally:
+            db.close()
+    except Exception:
+        return []
+
+
+_DELIVER = r"(?:chhod\w*|le\s+gaya|le\s+gayi|le\s+aaya|laya|layi|pahuncha\w*|lekar\s+(?:gaya|aaya))"
+
+
+def _driver_from_statement(results, full_statement):
+    """Sale / supplier ke maal mein driver khaali, par message mein jaana-pehchaana employee maal le gaya / laya
+    ("Kitanu trolley mein 800 eent Satbir ke yahan chhod aaya") → wahi driver."""
+    tools = (ToolName.RECORD_SALE_TRANSACTION, ToolName.RECORD_SUPPLIER_TRANSACTION)
+    todo = [r for r in results if r.tool_name in tools and not (getattr(r.arguments, "driver_name", None) or "").strip()]
+    if not todo or not full_statement:
+        return
+    low = full_statement.lower()
+    found = []
+    for name in _employee_names():
+        n = _re_drv.escape(name.strip().lower())
+        if _re_drv.search(r"(?<!\w)" + n + r"(?!\w)(?:\s+\S+){0,8}?\s+" + _DELIVER + r"\b", low) \
+                or _re_drv.search(r"\bdriver\s+" + n + r"(?!\w)", low):
+            found.append(name.strip())
+    if len(found) != 1:
+        return
+    for r in todo:
+        party = (getattr(r.arguments, "customer_name", None) or getattr(r.arguments, "supplier_name", None) or "").lower()
+        if party.split()[:1] == found[0].lower().split()[:1]:
+            continue
+        print(f"🚚 ARGUMENT: driver khaali tha — message mein '{found[0]}' maal le gaya / laya → driver_name")
+        r.arguments.driver_name = found[0]
+
+
+def _family_member_null(results, action_texts):
+    """LLM ne naam ki jagah 'null' / 'none' likh diya → khaali; ghar ka kharcha ho to member 'Ghar'."""
+    from family_rules import relation_person
+    for r in results:
+        if r.tool_name != ToolName.RECORD_FAMILY_TRANSACTION:
+            continue
+        a = r.arguments
+        for f in ("member_name", "relation"):
+            v = getattr(a, f, None)
+            if isinstance(v, str) and v.strip().lower() in ("null", "none", "nil", "n/a", "-"):
+                setattr(a, f, None)
+        if not (getattr(a, "member_name", None) or "").strip():
+            text = action_texts.get((r.group_id, r.action_index), "")
+            who = relation_person(text) or ("Ghar" if _re_drv.search(r"\b(ghar|ghr)\b|घर", text, _re_drv.IGNORECASE) else None)
+            if who:
+                print(f"👪 FAMILY: '{text}' — member khaali / 'null' tha → '{who}'")
+                a.member_name = who
+
+
+def _purchase_not_future(results, action_texts):
+    """Sauda aage ki tareekh ka nahi ho sakta ("kothi de di, paise agle hafte denge") → aaj.
+    Sabse aakhir mein — date node ki tareekh lagne ke BAAD."""
+    import datetime as _dt
+    for r in results:
+        if r.tool_name != ToolName.RECORD_PURCHASE:
+            continue
+        d = getattr(r.arguments, "purchase_date", None)
+        if isinstance(d, str):
+            try:
+                d = _dt.date.fromisoformat(d[:10])
+            except ValueError:
+                continue
+        if d and d > _dt.date.today():
+            print(f"📅 PURCHASE: '{action_texts.get((r.group_id, r.action_index), '')}' — sauda ki tareekh {d} "
+                  f"aage ki hai → aaj")
+            r.arguments.purchase_date = _dt.date.today()
+
+
+def _payment_from_expense(results, action_texts):
+    """
+    Kharcha + payment ek hi action mein: payment ki rakam khaali (ya LLM ne 'aadha' ko 0.5 likha) → kharche ki
+    rakam ('aadha' ho to ÷ 2); description khaali → kharche ka description (payment ko kharche se jodne ke liye).
+    """
+    from expense_rules import HALF
+    by_action = {}
+    for r in results:
+        by_action.setdefault((r.group_id, r.action_index), []).append(r)
+    for key, rs in by_action.items():
+        exp = next((r for r in rs if r.tool_name == ToolName.RECORD_EXPENSE), None)
+        pay = next((r for r in rs if r.tool_name == ToolName.RECORD_EXPENSE_PAYMENT), None)
+        if not exp or not pay:
+            continue
+        text = action_texts.get(key, "")
+        total = getattr(exp.arguments, "amount", None)
+        cur = getattr(pay.arguments, "amount", None)
+        if total and total > 0 and (cur in (None, 0) or (HALF.search(text) and (0 < cur < 1 or abs(cur - total) < 0.01))):
+            pay.arguments.amount = round(total / 2, 2) if HALF.search(text) else total
+            print(f"💵 KHARCHA: '{text}' — payment ki rakam = {pay.arguments.amount:g}")
+        if not (getattr(pay.arguments, "description", None) or "").strip() and getattr(exp.arguments, "description", None):
+            pay.arguments.description = exp.arguments.description
+
+
+def _apply_resolved_date(arguments, resolved: str | None):
+    """Har date field ko Date Resolution wali date (YYYY-MM-DD) pe set karo — field ke type ke hisaab se."""
+    from datetime import date as _date
+    if not resolved:
+        return
+    try:
+        d = _date.fromisoformat(resolved)
+    except ValueError:
+        return
+    fields = getattr(type(arguments), "model_fields", {})
+    for name in _DATE_FIELDS:
+        if name not in fields:
+            continue
+        ann = str(fields[name].annotation)
+        new = d if "date" in ann and "str" not in ann else d.isoformat()
+        old = getattr(arguments, name, None)
+        if str(old) != d.isoformat():
+            print(f"📅 ARGUMENT: {name} {old} → {d.isoformat()} (date node ka faisla)")
+        setattr(arguments, name, new)
+
+
+def _enum_text(value):
+    """Enum ho to uski value, text ho to text, khaali ho to None.
+    (Checkpoint se aate waqt Enum kabhi-kabhi saadha text ban jaata hai — crash nahi hona chahiye.)"""
+    if value is None or value == "":
+        return None
+    return getattr(value, "value", value)
+
 
 async def tool_argument_extraction_node(state):
     """
@@ -3132,6 +3655,7 @@ async def tool_argument_extraction_node(state):
     tool_decision_results = state.get("tool_decision_results")
     material_movement_results = state.get("material_movement_results", {})
     transaction_classifier_results = state.get("transaction_classifier_results", {})
+    resolved_person_roles = state.get("resolved_person_roles") or {}
 
     if grouped_intent is None:
         raise ValueError("grouped_intent not found in state.")
@@ -3147,6 +3671,8 @@ async def tool_argument_extraction_node(state):
     }
 
     extracted_arguments = []
+    action_texts = {}
+    full_statement = str(state.get("original_user_statement") or "")
 
     for decision in tool_decision_results:
 
@@ -3158,6 +3684,10 @@ async def tool_argument_extraction_node(state):
             )
 
         for action_decision in decision.action_decisions:
+            if not 0 <= action_decision.action_index < len(group.actions):
+                print(f"⚠️ ARGUMENT EXTRACTION: action_index {action_decision.action_index} group "
+                      f"{group.group_id} mein nahi ({len(group.actions)} actions) — skip")
+                continue
             action = group.actions[action_decision.action_index]
             current_action = f"{action.text} on {action.date}"
 
@@ -3166,6 +3696,7 @@ async def tool_argument_extraction_node(state):
                     tool_name=tool_name,
                     user_message=current_action,
                     current_action=current_action,
+                    bundle_tools=_bundle_for(group, resolved_person_roles, transaction_classifier_results),
                 )
 
                 # Material Movement — source/destination fields are
@@ -3177,15 +3708,76 @@ async def tool_argument_extraction_node(state):
                     resolved = material_movement_results.get(decision.group_id)
                     if resolved:
                         arguments.source_name = resolved.get("source")
-                        arguments.source_type = (
-                            resolved["source_type"].value
-                            if resolved.get("source_type") else None
-                        )
+                        arguments.source_type = _enum_text(resolved.get("source_type"))
                         arguments.destination_name = resolved.get("destination")
-                        arguments.destination_type = (
-                            resolved["destination_type"].value
-                            if resolved.get("destination_type") else None
-                        )
+                        arguments.destination_type = _enum_text(resolved.get("destination_type"))
+                # Sale (OUT) / maal aaya (IN) — jagah bhi upar tay ho chuki hai.
+                # "Pata nahi" → None → stock ko haath nahi lagega (LLM "UNKNOWN" na likh de).
+                resolved_mm = material_movement_results.get(decision.group_id)
+                classified = transaction_classifier_results.get(decision.group_id)
+                if resolved_mm and classified is not None:
+                    if (tool_name == ToolName.RECORD_SALE_TRANSACTION
+                            and classified.transaction_type == TransactionType.OUT):
+                        arguments.source = resolved_mm.get("source")
+                    if (tool_name == ToolName.RECORD_SUPPLIER_TRANSACTION
+                            and classified.transaction_type == TransactionType.IN):
+                        arguments.destination_location = resolved_mm.get("destination")
+                    # "UltraTech ke dealer Bansal" — pehchaan note mein (naam se hata di thi)
+                    if resolved_mm.get("descriptor") and hasattr(arguments, "note") and tool_name in (
+                            ToolName.RECORD_SUPPLIER_TRANSACTION, ToolName.RECORD_SALE_TRANSACTION):
+                        desc = resolved_mm["descriptor"]
+                        if desc.lower() not in (arguments.note or "").lower():
+                            arguments.note = f"{arguments.note}; {desc}" if arguments.note else desc
+                            print(f"📝 NOTE: pehchaan '{desc}' note mein")
+                    # "purana bazar sharma ji k utari" — customer = insaan, jagah = address
+                    if resolved_mm.get("address"):
+                        if tool_name == ToolName.RECORD_SALE_TRANSACTION:
+                            arguments.destination_name = resolved_mm["address"]
+                        if tool_name == ToolName.RECORD_SUPPLIER_TRANSACTION:
+                            arguments.destination_location = resolved_mm["address"]
+                        print(f"📍 ADDRESS: {tool_name.value} mein address '{resolved_mm['address']}'")
+                    # Naam bhi wahi jo DB mein mila ("SBI bhatte" → "SBI Bhatta"), warna naya duplicate banega
+                    if (classified.transaction_type == TransactionType.IN
+                            and _enum_text(resolved_mm.get("source_type")) == "supplier"
+                            and resolved_mm.get("source")
+                            and hasattr(arguments, "supplier_name")):
+                        arguments.supplier_name = resolved_mm.get("source")
+                    if (classified.transaction_type == TransactionType.OUT
+                            and _enum_text(resolved_mm.get("destination_type")) == "customer"
+                            and resolved_mm.get("destination")
+                            and hasattr(arguments, "customer_name")):
+                        arguments.customer_name = resolved_mm.get("destination")
+                # Opening balance — party_type LLM ka guess nahi, pehle se tay hua
+                # role hai (Need Person branch). Bina person ka group = shuru ka cash.
+                if tool_name == ToolName.RECORD_OPENING_BALANCE:
+                    role = resolved_person_roles.get(decision.group_id)
+                    role_map = {
+                        PersonRole.EMPLOYEE: OpeningPartyType.EMPLOYEE,
+                        PersonRole.CUSTOMER: OpeningPartyType.CUSTOMER,
+                        PersonRole.SUPPLIER: OpeningPartyType.SUPPLIER,
+                    }
+                    if role in role_map:
+                        arguments.party_type = role_map[role]
+                    elif group.record_type == RecordType.STANDALONE_TRANSACTION:
+                        arguments.party_type = OpeningPartyType.CASH
+                    # Enum member hi rakho (string nahi) — warna pydantic serializer warning
+                    if arguments.party_type == OpeningPartyType.CASH:
+                        arguments.direction = OpeningDirection.CASH
+                        arguments.party_name = None
+                    else:
+                        # "humare upar chadhe hain" = hum denge (dena); "unke upar / lene hain" = hum lenge (lena)
+                        dena, lena = bool(_OWE_US.search(action.text or "")), bool(_OWE_THEM.search(action.text or ""))
+                        want = OpeningDirection.DENA if dena and not lena else OpeningDirection.LENA if lena and not dena else None
+                        if want is not None and arguments.direction != want:
+                            print(f"↔️ OPENING: '{action.text}' — direction {getattr(arguments.direction, 'value', arguments.direction)} → {want.value}")
+                            arguments.direction = want
+
+                # Family kharcha bina naam ke ("ghar ke liye 5000 nikale") → "Ghar"
+                if (tool_name == ToolName.RECORD_FAMILY_TRANSACTION
+                        and not (arguments.member_name or "").strip()
+                        and group.record_type == RecordType.STANDALONE_TRANSACTION):
+                    arguments.member_name = "Ghar"
+
                 classifier_result = transaction_classifier_results.get(decision.group_id)
                 if (
                     tool_name == ToolName.RECORD_SALE_TRANSACTION
@@ -3193,7 +3785,161 @@ async def tool_argument_extraction_node(state):
                     and classifier_result.transaction_type == TransactionType.DIRECT_SALE
                 ):
                     arguments.update_inventory = False
+                # Kharche ki category: saaf shabd (theek/servicing/tyre → repair, diesel/CNG → fuel, kiraya → rent)
+                if tool_name == ToolName.RECORD_EXPENSE:
+                    from expense_rules import category_from_text
+                    want = category_from_text(action.text)
+                    cur = getattr(arguments.category, "value", arguments.category)
+                    if want and cur != want:
+                        print(f"🏷️ KHARCHA: '{action.text}' — category {cur} → {want}")
+                        arguments.category = ExpenseCategory(want)
 
+                # "Malik sahab ki dukaan todne mein…" — kisi aur ki dukaan/godown hamari shop/gudam nahi → site
+                if tool_name == ToolName.RECORD_WORK_LOG:
+                    _own = _re_mod.search(r"\b[A-Z][a-z]+\s+(?:ji|sahab|saab|seth)\s+(?:ki|ke|ka)\s+"
+                                          r"(?:dukaan|dukan|godown|gudam|haveli|kothi|building|dharamshala|makaan)",
+                                          action.text or "")
+                    cur = getattr(getattr(arguments, "location_type", None), "value", getattr(arguments, "location_type", None))
+                    if _own and cur in ("shop", "gudam"):
+                        print(f"🏚️ WORK LOG: '{_own.group(0)}' kisi aur ki jagah hai — location_type site")
+                        arguments.location_type = type(arguments.location_type)("site")
+                        if not (arguments.location_name or "").strip():
+                            arguments.location_name = _own.group(0)
+
+                # Stock adjustment: unit na ho to bori/ton/kg/piece; toota/kam → minus, zyada → plus;
+                # item / jagah khaali → poore statement se ("20 dukaan pahunch ke tooti nikli")
+                if tool_name == ToolName.RECORD_ADJUSTMENT:
+                    from stock_rules import stock_sign, unit_from_text, place_in
+                    full = state.get("original_user_statement") or action.text
+                    if not getattr(arguments, "unit", None):
+                        arguments.unit = InventoryUnit(unit_from_text(action.text + " " + full))
+                        print(f"📦 STOCK: '{action.text}' — unit nahi bola, '{arguments.unit.value}' maana")
+                    sign = stock_sign(action.text)
+                    q = getattr(arguments, "quantity_change", None)
+                    if sign and q:
+                        want = abs(q) * sign
+                        if want != q:
+                            print(f"📦 STOCK: '{action.text}' — quantity_change {q:g} → {want:g}")
+                            arguments.quantity_change = want
+                    if not (arguments.item_name or "").strip() or not goods_word(str(arguments.item_name)):
+                        g = goods_word(action.text) or goods_word(full)
+                        if g:
+                            arguments.item_name = g
+                            print(f"📦 STOCK: '{action.text}' — item '{g}' statement se")
+                    if not (arguments.location or "").strip():
+                        loc = place_in(action.text) or place_in(full)
+                        if loc:
+                            arguments.location = loc
+
+                # "Sharma ji ka hisab clear ho gaya" + "4000 de gaye" — group ek hi aadmi ka hai, tool mein naam khaali → group ka naam
+                if group.record_type == RecordType.NEED_PERSON and str(group.identity_key or "").strip() \
+                        and str(group.identity_key).strip().upper() != "UNKNOWN":
+                    for _pf in ("customer_name", "supplier_name", "employee_name", "member_name", "seller_name"):
+                        if _pf in type(arguments).model_fields and not str(getattr(arguments, _pf) or "").strip():
+                            print(f"👤 ARGUMENT: {tool_name.value}.{_pf} khaali — group ka naam '{group.identity_key}'")
+                            setattr(arguments, _pf, group.identity_key)
+
+                # Family: disha (jama/kharcha) saaf shabdon se — "wapas le gayi" / "unko wapas kar diye" kharcha hai
+                if tool_name == ToolName.RECORD_FAMILY_TRANSACTION:
+                    from family_rules import family_direction, TILL, relation_person
+                    # "galle se diya" — galla jagah hai, member nahi
+                    if TILL.match(str(arguments.member_name or "")):
+                        new_m = relation_person(action.text) or "Ghar"
+                        print(f"🏠 FAMILY: member '{arguments.member_name}' paisa rakhne ki jagah hai — '{new_m}'")
+                        arguments.member_name = new_m
+                    from tool_argument_models import FamilyTransactionType
+                    want = family_direction(action.text)
+                    cur = getattr(arguments.transaction_type, "value", arguments.transaction_type)
+                    if want and cur != want:
+                        print(f"🧭 FAMILY: '{action.text}' — {cur} → {want}")
+                        arguments.transaction_type = FamilyTransactionType(want)
+                # "do-dhai hazaar" — andaaza hai, pakki rakam nahi → amount khaali (system poochhega)
+                from family_rules import AMOUNT_RANGE
+                if AMOUNT_RANGE.search(action.text or "") and getattr(arguments, "amount", None):
+                    print(f"❓ RAKAM: '{action.text}' — rakam andaaze mein hai ({arguments.amount:g}), poochhenge")
+                    arguments.amount = None
+                # "2000 eent le aaya, 12000 dene baaki hain" — baaki wali rakam hi maal ki rakam hai
+                if tool_name == ToolName.RECORD_SUPPLIER_TRANSACTION and not getattr(arguments, "amount", None):
+                    _due = _re_due.search(action.text or "")
+                    if _due:
+                        arguments.amount = float(_due.group(1).replace(",", ""))
+                        print(f"💰 SUPPLIER: '{action.text}' — baaki rakam {arguments.amount:g} = maal ki rakam")
+
+                # "1500 seedhi Saini ji ko di" — maal seedha gaya, gudam/shop ka stock nahi ghatega
+                if (tool_name == ToolName.RECORD_SALE_TRANSACTION and _SEEDHA.search(action.text or "")
+                        and getattr(arguments, "update_inventory", None) is not False):
+                    print(f"📦 STOCK: '{action.text}' — seedha gaya, update_inventory False")
+                    arguments.update_inventory = False
+
+                # Item ka naam sirf vishesan ("nayi", "purani") → text se asli saamaan
+                if tool_name in (ToolName.RECORD_SALE_TRANSACTION, ToolName.RECORD_SUPPLIER_TRANSACTION) \
+                        and str(getattr(arguments, "item_name", "") or "").strip().lower() in ITEM_ADJECTIVES:
+                    real = goods_word(action.text) or goods_word(full_statement)
+                    if real:
+                        print(f"📦 ITEM: '{arguments.item_name}' vishesan hai — item '{real}' ('{action.text}')")
+                        arguments.item_name = real
+
+                # Haazri: driving sirf gaadi/trip ke shabd pe, "aadhe din baad chala gaya" = half
+                if tool_name == ToolName.RECORD_ATTENDANCE:
+                    for change in fix_attendance_args(arguments, action.text):
+                        print(f"🕐 HAAZRI: {change} ('{action.text}')")
+
+                # Date: Date Resolution node ka faisla hi aakhri — LLM action text ("kal ki mazdoori",
+                # "aaj") se apni date na nikale.
+                _apply_resolved_date(arguments, action.date)
+
+                # "Ram ko 300 diye (Ram ne load ki)" — LLM ne 'work' bina amount banaya par
+                # text mein ek hi paisa aur dene ki kriya hai → wo payment hai
+                if (tool_name == ToolName.RECORD_EMPLOYEE_TRANSACTION
+                        and getattr(arguments, "amount", None) in (None, 0)):
+                    _nums = _re_pay.findall(r"\d[\d,]*", strip_non_money(action.text))
+                    if len(set(_nums)) == 1 and _PAID_WORDS.search(action.text):
+                        from tool_argument_models import EmployeeTransactionType
+                        arguments.amount = float(_nums[0].replace(",", ""))
+                        arguments.transaction_type = EmployeeTransactionType.PAYMENT
+                        print(f"💰 PAYMENT: '{action.text}' — amount nahi tha, text se payment {arguments.amount}")
+
+                # Bikri: minus sirf wapsi mein ("50 eent wapas ki, 400 kam karne hain")
+                if tool_name in (ToolName.RECORD_SALE_TRANSACTION, ToolName.RECORD_SUPPLIER_TRANSACTION):
+                    for change in fix_return_sign(arguments, action.text):
+                        print(f"↩️ WAPSI: {change} ('{action.text}')")
+
+                # Bikri / supplier se maal: rate × ginti = total
+                if tool_name in (ToolName.RECORD_SALE_TRANSACTION, ToolName.RECORD_SUPPLIER_TRANSACTION):
+                    for change in fix_per_bulk_rate(arguments, action.text):
+                        print(f"🧮 RATE: {change} ('{action.text}')")
+                    for change in fix_per_unit_rate(arguments, action.text):
+                        print(f"🧮 RATE: {change} ('{action.text}')")
+                    if fix_ton_kg(arguments, action.text):
+                        print(f"⚖️ UNIT: ginti {arguments.quantity:g} kg mein hai par unit 'ton' tha → kg ('{action.text}')")
+                        arguments.unit = InventoryUnit.KG
+                    for change in fix_rate_amount(arguments):
+                        print(f"🧮 RATE: {change} ('{action.text}')")
+
+                # Note: bekaar tukda ("wahan kaam kiya") ya date → code se saaf
+                if hasattr(arguments, "note"):
+                    new_note, why = clean_note(arguments.note, arguments.model_dump())
+                    if why:
+                        print(f"📝 NOTE: {why}")
+                        arguments.note = new_note
+
+                # Naam DB ke asli record se ("SBI bhata" → "SBI Bhatta", "Beldar Sohan" → "Sohan")
+                for field in NAME_FIELD_MODELS:
+                    old_name = getattr(arguments, field, None)
+                    if isinstance(old_name, str) and strip_descriptor(old_name) != old_name:
+                        print(f"🔗 NAAM: '{old_name}' → '{strip_descriptor(old_name)}' (pehchaan hataayi)")
+                        desc = split_descriptor(old_name)[1]
+                        if desc and hasattr(arguments, "note") and desc.lower() not in (arguments.note or "").lower():
+                            arguments.note = f"{arguments.note}; {desc}" if arguments.note else desc
+                        old_name = strip_descriptor(old_name)
+                        setattr(arguments, field, old_name)
+                    if isinstance(old_name, str) and old_name.strip():
+                        new_name = resolve_person_name(old_name, field)
+                        if new_name != old_name:
+                            print(f"🔗 NAAM: {field} '{old_name}' → DB ka '{new_name}'")
+                            setattr(arguments, field, new_name)
+
+                action_texts[(decision.group_id, action_decision.action_index)] = action.text
                 extracted_arguments.append(
                     ToolArgumentResult(
                         group_id=decision.group_id,
@@ -3202,6 +3948,13 @@ async def tool_argument_extraction_node(state):
                         arguments=arguments,
                     )
                 )
+
+    _payment_from_sale(extracted_arguments, action_texts)
+    _payment_from_purchase(extracted_arguments, action_texts)
+    _payment_from_expense(extracted_arguments, action_texts)
+    _purchase_not_future(extracted_arguments, action_texts)
+    _driver_from_statement(extracted_arguments, full_statement)
+    _family_member_null(extracted_arguments, action_texts)
 
     direct_sale_group_ids = {
         group_id

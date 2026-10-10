@@ -128,11 +128,15 @@ class HITLReason(str, Enum):
     HIGH_CONFIDENCE_CONFIRMATION = "HIGH_CONFIDENCE_CONFIRMATION"
     MEDIUM_CONFIDENCE_SELECTION = "MEDIUM_CONFIDENCE_SELECTION"
     LOW_CONFIDENCE_SELECTION = "LOW_CONFIDENCE_SELECTION"
+    # Naam pehle se hisab mein hai (employee / customer / ... table mein mila)
+    KNOWN_PERSON_CONFIRMATION = "KNOWN_PERSON_CONFIRMATION"   # sirf ek category mein mila → confirm karo
+    KNOWN_PERSON_SELECTION = "KNOWN_PERSON_SELECTION"         # kai category mein mila → ✓ ke saath chuno
 
 class HITLOption(BaseModel):
     option_id: int = Field(description="Unique option identifier.")
     role: PersonRole = Field(description="Candidate role.")
     confidence: float = Field(ge=0, le=10, description="Confidence score assigned to this role.")
+    found: bool = Field(default=False, description="True if this person's name already exists in this role's records.")
 
 class PersonRoleHITLRequest(BaseModel):
     """
@@ -180,6 +184,12 @@ class ToolName(str, Enum):
     RECORD_PURCHASE = "record_purchase"
     RECORD_PURCHASE_PAYMENT = "record_purchase_payment"
 
+    # Opening balance (Hisab-Kitab se pehle ka purana baaki / cash)
+    RECORD_OPENING_BALANCE = "record_opening_balance"
+
+    # Family (ghar ke log — family kharcha)
+    RECORD_FAMILY_TRANSACTION = "record_family_transaction"
+
 
 class TransactionType(str, Enum):
     IN = "IN"
@@ -193,20 +203,26 @@ NEED_PERSON_BUNDLE = {
         ToolName.MANAGE_EMPLOYEE,
         ToolName.RECORD_EMPLOYEE_TRANSACTION,
         ToolName.RECORD_ATTENDANCE,
+        ToolName.RECORD_OPENING_BALANCE,
     ],
     PersonRole.SUPPLIER: [
         ToolName.MANAGE_SUPPLIER,
         ToolName.RECORD_SUPPLIER_TRANSACTION,
         ToolName.RECORD_SUPPLIER_PAYMENT,
+        ToolName.RECORD_OPENING_BALANCE,
     ],
     PersonRole.CUSTOMER: [
         ToolName.MANAGE_CUSTOMER,
         ToolName.RECORD_SALE_TRANSACTION,
         ToolName.RECORD_SALE_PAYMENT,
+        ToolName.RECORD_OPENING_BALANCE,
     ],
     PersonRole.PROPERTY_OWNER: [
         ToolName.RECORD_PURCHASE,
         ToolName.RECORD_PURCHASE_PAYMENT,
+    ],
+    PersonRole.FAMILY_MEMBER: [
+        ToolName.RECORD_FAMILY_TRANSACTION,
     ],
 }
 
@@ -244,6 +260,8 @@ STANDALONE_BUNDLE = [
     ToolName.RECORD_PURCHASE_PAYMENT,
     ToolName.RECORD_WORK_LOG,
     ToolName.RECORD_ADJUSTMENT,
+    ToolName.RECORD_OPENING_BALANCE,   # shuru ka cash ("galle mein 40000 tha")
+    ToolName.RECORD_FAMILY_TRANSACTION,  # bina naam ka ghar ka kharcha → member "Ghar"
 ]
 
 # -- material movement schemas
@@ -280,6 +298,7 @@ class MaterialMovementHITLRequest(BaseModel):
     missing_field: str | None = Field(default=None, description="Which field is missing: 'source' or 'destination'. Set only when reason=MISSING_FIELD.")
     location_name: str | None = Field(default=None, description="The location name needing type confirmation. Set only when reason=LOCATION_TYPE_CONFIRMATION.")
     options: List[LocationTypeOption] = Field(default_factory=list, description="Available location type options. Populated only when reason=LOCATION_TYPE_CONFIRMATION.")
+    suggestions: List[str] = Field(default_factory=list, description="MISSING_FIELD: known storage locations to offer as quick choices (plus 'pata nahi').")
 
 class MaterialMovementHITLResponse(BaseModel):
     """
@@ -527,17 +546,41 @@ class CorrectionStatementHITLResponse(BaseModel):
     answer: str
 
 
+# =====================================================================
+# --- Reporting Phase
+# =====================================================================
+
+class ReportParseResult(BaseModel):
+    kind: str | None = Field(default=None, description=(
+        "overall | person | purchase | expense | cash_flow | work_log | material_movement, or null"))
+    person_name: str | None = Field(default=None, description="Named person/party, else null.")
+    person_role: str | None = Field(default=None, description="employee | customer | supplier | family, only if stated.")
+    date_from: str | None = Field(default=None, description="YYYY-MM-DD if a duration/date is stated, else null.")
+    date_to: str | None = Field(default=None, description="YYYY-MM-DD if a duration/date is stated, else null.")
+    language: str | None = Field(default=None, description="hi | hg | en if the user asks for a language, else null.")
 
 
+class ReportRangeResult(BaseModel):
+    date_from: str | None = Field(default=None, description="YYYY-MM-DD or null")
+    date_to: str | None = Field(default=None, description="YYYY-MM-DD or null")
 
 
+class ReportOption(BaseModel):
+    option_id: int
+    label: str
 
 
+class ReportHITLRequest(BaseModel):
+    """Report ka har sawaal — ek hi shape: question + numbered options (+ text allowed?)."""
+    step: str = Field(description="kind | role | name | range | language")
+    question: str
+    options: List[ReportOption] = Field(default_factory=list)
+    allow_text: bool = False
+    hint: str | None = None
+    retry: bool = False
 
 
-
-
-
-
-
-
+class ReportHITLResponse(BaseModel):
+    selected_option: int | None = None
+    answer: str | None = None
+    cancelled: bool = False
