@@ -14,17 +14,17 @@ Most small businesses in India (kirana and hardware shops, building-material tra
 
 ## Results at a glance
 
-Evaluated on **695 locked test statements** (425 development + 270 unseen holdout), Hinglish input, gpt-4o-mini at temperature 0. An entry counts as correct only if the tool and every key field (person, amount, date, item, quantity, rate, place) are right.
+Evaluated on **695 locked test statements** (425 development + 270 unseen holdout), Hinglish input, gpt-4o-mini at temperature 0. An entry counts as correct only if the tool and every key field (person, amount, date, item, quantity, rate, place) are right. Accuracy and error rates are **per entry**: one statement can produce several entries (round 2: 135 statements → 166 scored entries). "Statements fully right" is the statement-level result.
 
-| | Strict accuracy | Silent-error rate* |
-|---|---|---|
-| **Holdout round 2 — final, unseen, run once** | **75.3%** (95% CI 68.2–81.2%) | **9.6%** |
-| Holdout round 1 — unseen, later used for fixes | 62.9% (95% CI 55.6–69.7%) | 18.5% |
-| Development bundles — after fixes | 85–100% per bundle | 0–8.5% per bundle |
+| | Entries strictly correct | Silent-error rate* | Statements fully right |
+|---|---|---|---|
+| **Holdout round 2 — final, unseen, run once** | **75.3%** of 166 (95% CI 68.2–81.2%) | **9.6%** | **103 / 135** |
+| Holdout round 1 — unseen, later used for fixes | 62.9% of 178 (95% CI 55.6–69.7%) | 18.5% | 90 / 135 |
+| Development bundles — after fixes | 85–100% per bundle | 0–8.5% per bundle | — |
 
 \* *Silent error = a wrong entry the owner is not warned about — the most important number for an accounting tool.*
 
-- Development numbers are optimistic: fixes were made while looking at those statements. **The holdout number (≈75%) is the realistic estimate** on new wording.
+- Development numbers are optimistic: fixes were made while looking at those statements. **The holdout number (≈75% of entries) is the realistic estimate** on new wording.
 - From round 1 to round 2, silent errors roughly halved; for the entry bundles the accuracy intervals do not overlap.
 - **Cost:** about US$0.004–0.006 per statement (≈ ₹300–450 a month for a shop with 30 entries a day).
 
